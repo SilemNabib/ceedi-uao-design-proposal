@@ -22,7 +22,30 @@ export const PICS = {
   'campus-panoramica': { src: 'assets/universidad-autonoma-de-occidente.jpg', w: 1920, h: 732, alt: 'Vista panorámica del campus de la UAO al atardecer, entre jardines y palmeras' },
 };
 
-export const LEGAL = 'Personería jurídica, Res. No. 0618, de la Gobernación del Valle del Cauca, del 20 de febrero de 1970. Universidad Autónoma de Occidente, Res. No. 2766, del Ministerio de Educación Nacional, del 13 de noviembre de 2003. Acreditación Institucional de Alta Calidad, Res. 23002 del 30 de noviembre de 2021, con vigencia hasta el 2025. Acreditación Internacional de Alta Calidad, acuerdo No. 85 del 26 de enero de 2022 del Cinda. Vigilada MinEducación.';
+// Texto legal, datos y enlaces institucionales tomados tal cual del pie de uao.edu.co (noviembre de 2026).
+export const LEGAL = 'Personería jurídica, Res. No. 0618, de la Gobernación del Valle del Cauca, del 20 de febrero de 1970. Universidad Autónoma de Occidente, Res. No. 2766, del Ministerio de Educación Nacional, del 13 de noviembre de 2003. Acreditación Institucional en Alta Calidad, Res. 020477 del 3 de agosto de 2026, con vigencia hasta el 2034. Acreditación Internacional en Alta Calidad, acuerdo No. 85 del 26 de enero de 2022 del Cinda. Vigilada MinEducación.';
+
+export const REDES = [
+  { id: 'facebook', nombre: 'Facebook', href: 'https://www.facebook.com/universidadautonomadeoccidente' },
+  { id: 'x', nombre: 'X', href: 'https://twitter.com/lauao' },
+  { id: 'instagram', nombre: 'Instagram', href: 'https://www.instagram.com/universidadautonomadeoccidente/' },
+  { id: 'youtube', nombre: 'YouTube', href: 'https://www.youtube.com/user/autonomadeocc' },
+  { id: 'linkedin', nombre: 'LinkedIn', href: 'https://www.linkedin.com/school/universidadautonomadeoccidente' },
+];
+
+// Contacto de la Universidad. El del CEEDi (CONTACTO, más abajo) sigue por confirmar.
+export const CONTACTO_UAO = [
+  { i: 'telefono', t: 'PBX', p: '(602) 3188000', href: 'tel:+576023188000' },
+  { i: 'correo', t: 'Correo', p: 'buzon@uao.edu.co', href: 'mailto:buzon@uao.edu.co' },
+  { i: 'ubicacion', t: 'Dirección', p: 'Cll 25 # 115-85 Km 2 Vía Cali - Jamundí.<br>Cali, Colombia. Código Postal: 760030' },
+];
+
+export const POLITICAS = [
+  { t: 'Aviso de privacidad', href: 'https://www.uao.edu.co/aviso-de-privacidad-de-la-universidad-autonoma-de-occidente/' },
+  { t: 'Política de Tratamiento de Datos Personales', href: 'https://www.uao.edu.co/politica-proteccion-datos-uao/' },
+  { t: 'Términos y Condiciones del Sitio', href: 'https://www.uao.edu.co/terminos-y-condiciones-del-sitio/' },
+  { t: 'Documentos institucionales', href: 'https://www.uao.edu.co/documentos-institucionales/' },
+];
 
 export const CREDITOS = 'Fotografías de campus: <a href="https://commons.wikimedia.org/w/index.php?curid=12123707">“Universidad Autonoma de Occidente Cali”</a> y <a href="https://commons.wikimedia.org/w/index.php?curid=23885498">“Universidad Autónoma de Occidente, Cali, Colombia (campus)”</a>, de Jyon, licencias <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a> y <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/wiki/File:Universidad_Aut%C3%B3noma_de_Occidente.jpg">“Universidad Autónoma de Occidente”</a>, de Jisuca, licencia <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>, vía Wikimedia Commons. Las demás fotografías provienen del Manual de Identidad UAO.';
 

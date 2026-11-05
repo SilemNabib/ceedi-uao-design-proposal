@@ -10,7 +10,7 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 /* ---------------- piezas de marca ---------------- */
 const ARCO = 'M491.82 7.79V238.13C491.82 242.43 488.34 245.91 484.04 245.91H428.38C424.11 245.91 420.03 244.16 417.1 241.06 374.18 195.67 313.34 167.36 245.91 167.36 178.48 167.36 117.64 195.67 74.72 241.06 71.79 244.16 67.71 245.91 63.45 245.91H7.79C3.48 245.91 0 242.43 0 238.13V7.79C0 3.49 3.48 0 7.79 0H484.04C488.34 0 491.82 3.49 491.82 7.79Z';
 const vineta = `<svg class="vineta" viewBox="0 0 491.82 245.91" aria-hidden="true"><path d="${ARCO}"/></svg>`;
-const flecha = (c = 'nav__flecha') => `<svg class="${c}" viewBox="0 0 12 7" fill="none" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const flecha = (c = 'nav__flecha') => `<svg class="${c}" viewBox="0 0 12 8" fill="currentColor" aria-hidden="true"><path d="M.9 1h10.200a.6.6 0 0 1 .47.97L6.470 7.400a.6.6 0 0 1-.94 0L.430 1.970A.6.6 0 0 1 .9 1Z"/></svg>`;
 
 // Íconos: línea uniforme, esquinas curvas y puntas redondeadas (manual p. 46-47)
 const I = {
@@ -24,6 +24,15 @@ const I = {
   correo: '<rect x="5" y="9" width="34" height="26" rx="4"/><path d="M6 12l14 11.2c1.2.9 2.8.9 4 0L38 12"/>',
   ubicacion: '<path d="M22 40S9 27.7 9 18a13 13 0 0 1 26 0c0 9.7-13 22-13 22Z"/><circle cx="22" cy="18" r="5"/>',
   reloj: '<circle cx="22" cy="22" r="16"/><path d="M22 12v10l7 4"/>',
+  telefono: '<path d="M14.500 6h-5C7.600 6 6 7.600 6 9.500 6 24.700 19.300 38 34.500 38c1.900 0 3.500-1.600 3.500-3.500v-5c0-1.200-.7-2.300-1.900-2.700l-6.800-2.300c-1-.3-2.200-.1-3 .7l-2.500 2.500c-4.300-2.200-7.800-5.700-10-10l2.500-2.500c.8-.8 1-2 .7-3l-.8-4C15.900 7 15.300 6 14.500 6Z"/>',
+};
+// Redes: las marcas de cada servicio, en plano y en el color del texto.
+const RED = {
+  facebook: '<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/>',
+  x: '<path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/>',
+  instagram: '<path fill-rule="evenodd" d="M7 1h10a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H7a6 6 0 0 1-6-6V7a6 6 0 0 1 6-6Zm0 2.200A3.800 3.800 0 0 0 3.200 7v10A3.800 3.800 0 0 0 7 20.800h10a3.800 3.800 0 0 0 3.800-3.800V7A3.800 3.800 0 0 0 17 3.200H7Zm5 3.300a5.500 5.500 0 1 1 0 11 5.500 5.500 0 0 1 0-11Zm0 2.200a3.300 3.300 0 1 0 0 6.600 3.300 3.300 0 0 0 0-6.600Zm5.700-3.700a1.300 1.300 0 1 1 0 2.600 1.300 1.300 0 0 1 0-2.600Z"/>',
+  youtube: '<path fill-rule="evenodd" d="M23.500 6.200a3 3 0 0 0-2.100-2.100C19.500 3.600 12 3.600 12 3.600s-7.500 0-9.400.5A3 3 0 0 0 .5 6.200C0 8.100 0 12 0 12s0 3.900.5 5.800a3 3 0 0 0 2.100 2.100c1.900.5 9.400.5 9.400.5s7.500 0 9.400-.5a3 3 0 0 0 2.100-2.100c.5-1.900.5-5.800.5-5.800s0-3.900-.5-5.800ZM9.600 15.600V8.400l6.200 3.600-6.200 3.600Z"/>',
+  linkedin: '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.850 3.370-1.850 3.601 0 4.267 2.370 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065Zm1.782 13.019H3.555V9h3.564v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.200 24 24 23.227 24 22.271V1.729C24 .774 23.200 0 22.222 0h.003Z"/>',
 };
 const arcoPath = (e = 0) => {
   const y = (v) => (v + e).toFixed(2);
@@ -81,33 +90,48 @@ const cabecera = (activa) => `
   </nav>
 </header>`;
 
+const enlacePie = ({ t, href }) => `<li><a href="${href}">${vineta}<span>${t}</span></a></li>`;
+
+// Un solo campo de color y una sola marca: el espacio separa las filas. Cierra con la franja roja y el domo que devuelve al inicio.
 const pie = () => `
 <footer class="pie">
-  <a class="pie__marca" href="index.html"><img src="assets/logo/uao-ceedi-crema.svg" width="620" height="131" alt="uao, Centro de Excelencia Educativa Digital" loading="lazy"></a>
-  <div class="pie__cols">
-    <div class="pie__col--a">
-      <h2>Qué hacemos</h2>
-      <ul>${C.AREAS.map((a) => `<li><a href="${a.href}">${a.nombre}</a></li>`).join('')}</ul>
-    </div>
-    <div class="pie__col--b">
-      <h2>Micrositio</h2>
-      <ul>
-        <li><a href="recursos.html">Recursos</a></li>
-        <li><a href="formacion.html">Formación</a></li>
-        <li><a href="ceedi.html">CEEDi</a></li>
-        <li><a href="solicita-acompanamiento.html">Solicita acompañamiento</a></li>
+  <div class="pie__cuerpo">
+    <div class="pie__cabeza">
+      <a class="pie__marca" href="index.html"><img src="assets/logo/uao-ceedi-crema.svg" width="620" height="131" alt="uao, Centro de Excelencia Educativa Digital. Ir al inicio" loading="lazy"></a>
+      <ul class="pie__redes" aria-label="Redes sociales de la Universidad">
+        ${C.REDES.map((r) => `<li><a class="pie__red" href="${r.href}" aria-label="${r.nombre}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${RED[r.id]}</svg></a></li>`).join('')}
       </ul>
     </div>
-    <div class="pie__col--c">
-      <h2>Universidad Autónoma de Occidente</h2>
-      <p>Centro de Excelencia Educativa Digital, Unidad de Cultura Digital.</p>
-      <p><a href="https://www.uao.edu.co" style="text-decoration-color:currentColor">uao.edu.co</a></p>
-      <div class="pie__uni"><img src="assets/logo/uao-horizontal-crema.svg" width="200" height="36" alt="uao, Universidad Autónoma de Occidente" loading="lazy"></div>
+    <div>
+      <h2 class="pie__titulo">Universidad Autónoma de Occidente</h2>
+      <ul class="pie__contacto">
+        ${C.CONTACTO_UAO.map((d) => `<li class="pie__dato">${icono(d.i)}<div><strong>${d.t}</strong>${d.href ? `<a href="${d.href}">${d.p}</a>` : `<span>${d.p}</span>`}</div></li>`).join('')}
+      </ul>
+    </div>
+    <nav class="pie__mapa" aria-label="Mapa del micrositio">
+      <div class="pie__fila">
+        <h2>Qué hacemos</h2>
+        <ul>${C.AREAS.map((a) => enlacePie({ t: a.nombre, href: a.href })).join('')}</ul>
+      </div>
+      <div class="pie__fila">
+        <h2>Micrositio</h2>
+        <ul>${[
+          { t: 'Recursos', href: 'recursos.html' },
+          { t: 'Formación', href: 'formacion.html' },
+          { t: 'CEEDi', href: 'ceedi.html' },
+          { t: 'Solicita acompañamiento', href: 'solicita-acompanamiento.html' },
+        ].map(enlacePie).join('')}</ul>
+      </div>
+    </nav>
+    <div class="pie__institucion">
+      <p class="pie__centro">Centro de Excelencia Educativa Digital, Unidad de Cultura Digital.<br><a class="pie__sitio" href="https://www.uao.edu.co">uao.edu.co</a></p>
+      <p class="pie__norma">${C.LEGAL}</p>
+      <p class="pie__creditos">${C.CREDITOS}</p>
     </div>
   </div>
-  <div class="pie__legal">
-    <p>${C.LEGAL}</p>
-    <p>${C.CREDITOS}</p>
+  <div class="pie__banda">
+    <a class="pie__subir" href="#contenido"><span class="sr">Volver arriba</span>${flecha('pie__subir-flecha')}</a>
+    <ul>${C.POLITICAS.map((p) => `<li><a href="${p.href}">${p.t}</a></li>`).join('')}</ul>
   </div>
 </footer>`;
 
@@ -163,7 +187,7 @@ const filaRecurso = (r, i = 0) => `
   <div>
     <div class="recurso__cab"><h3>${r.titulo}</h3><span class="recurso__tipo">${r.tipo}</span></div>
     <p>${r.texto}</p>
-    <a class="enlace" href="${r.href || 'recursos.html'}">Consultar recurso<span class="sr">: ${r.titulo}</span></a>
+    <a class="btn btn--ghost" href="${r.href || 'recursos.html'}">Consultar recurso<span class="sr">: ${r.titulo}</span></a>
   </div>
 </li>`;
 
@@ -181,7 +205,7 @@ const cierre = ({ titulo, texto, pregunta, boton = 'Solicitar acompañamiento', 
 
 const perfiles = (lista) => `<ul class="perfiles">${lista.map((p, i) => `
   <li class="perfil" data-sube style="--d:${i * 80}ms">
-    ${arcoIcono('persona', p.c, p.t, 170)}
+    ${arcoIcono('persona', p.c, p.t, 110)}
     <h4>${p.nombre}</h4>
     <span class="perfil__rol">${p.rol}</span>
     <p>${p.frase}</p>
@@ -193,7 +217,7 @@ const equipo = ({ intro, lista }) => `
     <h2 class="titulo" id="equipo-t" data-sube>Conoce a nuestro equipo</h2>
     <div data-sube style="--d:80ms">
       <p>${intro}</p>
-      <div class="acciones"><a class="btn" href="ceedi.html#equipo">Conoce al equipo</a></div>
+      <div class="acciones"><a class="btn btn--ghost" href="ceedi.html#equipo">Conoce al equipo</a></div>
     </div>
   </div>
   ${perfiles(lista)}
@@ -238,7 +262,7 @@ ${portada({
     color: 'rojo',
     h1: ['Potenciamos tus experiencias', 'de enseñanza con lo digital.'],
     texto: 'En el CEEDi acompañamos a los profesores UAO en el diseño de experiencias de aprendizaje, la creación de recursos educativos y la apropiación de tecnologías para fortalecer sus prácticas de enseñanza.',
-    acciones: `<a class="btn" href="#que-necesitas">Encuentra lo que necesitas</a><a class="btn btn--linea" href="solicita-acompanamiento.html">Solicita acompañamiento</a>`,
+    acciones: `<a class="btn" href="#que-necesitas">Encuentra lo que necesitas</a><a class="btn btn--secundario" href="solicita-acompanamiento.html">Solicita acompañamiento</a>`,
     fotoId: 'campus-anfiteatro',
     foco: '50% 38%',
     domoH: '9.9vw',
@@ -292,7 +316,7 @@ ${portada({
 
 <section class="banda" aria-labelledby="conoce-t" style="--foco-img:50% 58%">
   ${foto('campus-puente', 'class="deriva" loading="lazy" decoding="async"')}
-  <div class="banda__tarjeta arco" data-sube style="padding-bottom:clamp(58px,6vw,84px)">
+  <div class="banda__tarjeta arco" data-sube style="padding-bottom:clamp(52px,5.2vw,72px)">
     <h2 class="titulo" id="conoce-t">Conoce el CEEDi</h2>
     <p>Quiénes somos, qué hacemos y quiénes te acompañan en la Universidad.</p>
     <div class="acciones"><a class="btn" href="ceedi.html">Conoce el CEEDi</a></div>
@@ -644,7 +668,7 @@ ${portada({
     clase: 'display--ceedi',
     h1: ['Centro de Excelencia', 'Educativa Digital'],
     texto: 'El Centro de Excelencia Educativa Digital (CEEDi) articula el diseño de experiencias de aprendizaje, la creación de recursos educativos digitales y la apropiación de la cultura digital para fortalecer los procesos de enseñanza y aprendizaje en la Universidad Autónoma de Occidente.',
-    acciones: `<a class="btn" href="#equipo">Nuestro equipo</a><a class="btn btn--linea" href="#contacto">Contacto</a>`,
+    acciones: `<a class="btn" href="#equipo">Nuestro equipo</a><a class="btn btn--secundario" href="#contacto">Contacto</a>`,
     fotoId: 'campus-panoramica',
     foco: '62% 50%',
     domo: '36%',
@@ -661,7 +685,7 @@ ${portada({
     <li class="area" style="--c:${a.c};--t:${a.t};--d:${i * 90}ms" data-sube>
       <div class="area__arco arco"><h3>${a.nombre}</h3></div>
       <p>${a.breve}</p>
-      <a class="enlace" href="${a.href}">Conocer el área<span class="sr">: ${a.nombre}</span></a>
+      <a class="btn btn--ghost" href="${a.href}">Conocer el área<span class="sr">: ${a.nombre}</span></a>
     </li>`).join('')}
   </ul>
 </section>
@@ -670,7 +694,7 @@ ${portada({
   <h2 class="titulo" id="nuestro-t" data-sube style="margin-bottom:clamp(28px,3.4vw,52px)">Nuestro equipo</h2>
   ${C.AREAS.map((a) => `
   <section class="grupo" aria-labelledby="grupo-${a.id}">
-    <div class="grupo__cab"><h3 id="grupo-${a.id}">${a.nombre}</h3><a class="enlace" href="${a.href}">Ver el área</a></div>
+    <div class="grupo__cab"><h3 id="grupo-${a.id}">${a.nombre}</h3><a class="btn btn--ghost" href="${a.href}">Ver el área</a></div>
     ${perfiles(C.EQUIPO[a.id])}
   </section>`).join('')}
 </section>
@@ -753,7 +777,7 @@ pagina({
   <div class="gracias arco" id="gracias" hidden>
     <h2 class="titulo">Recibimos tu solicitud.</h2>
     <p>Te escribiremos a tu correo institucional con la alternativa de acompañamiento más adecuada.</p>
-    <a class="enlace" href="index.html" style="--enlace-hover:var(--rosa)">Volver al inicio</a>
+    <a class="btn btn--ghost" href="index.html">Volver al inicio</a>
   </div>
 </section>`,
 });
