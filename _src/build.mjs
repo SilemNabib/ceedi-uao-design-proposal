@@ -164,6 +164,9 @@ const pagina = ({ archivo, titulo, descripcion, activa, cuerpo }) => {
 <meta name="theme-color" content="#8A1428">
 <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/dm-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&family=Roboto+Slab:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="${CSS}">
 <script>document.documentElement.classList.add('js')</script>
 </head>
@@ -708,18 +711,25 @@ ${intro({
       </label>`).join('')}
     </fieldset>
     <p class="nota" data-aviso-ruta hidden style="margin-top:10px;font-weight:600;color:var(--vino)">Elige una opción para continuar. Si no estás seguro, marca “Tengo otra necesidad / No estoy seguro”.</p>
-    <div class="campos">
-      <div class="campos__pregunta" data-sube>
-        <h2 class="titulo" data-pregunta-titulo>Cuéntanos qué tienes en mente.</h2>
-        <p>Pedimos únicamente lo indispensable para comprender tu necesidad y canalizarla.</p>
-      </div>
-      <div class="campos__grupo">
-        <div class="campo-f" data-sube>
-          <label for="idea" data-pregunta-etiqueta>Cuéntanos brevemente tu idea, necesidad o reto.</label>
-          <textarea id="idea" name="idea" required></textarea>
-          <span class="error">Cuéntanos al menos una frase para poder orientarte.</span>
-        </div>
-        <div class="dos-campos" data-sube style="--d:70ms">
+    <!-- Formulario con la estructura de contacto de uao.edu.co: tarjeta blanca con sello, datos de la institución
+         a la izquierda y el panel gris del formulario a la derecha, sobre el marco rojo. -->
+    <div class="formu" data-sube>
+      <div class="formu__tarjeta">
+        <aside class="formu__info" aria-labelledby="formu-inst">
+          <span class="formu__sello"><img src="assets/logo/uao-rojo.svg" width="102" height="34" alt="Universidad Autónoma de Occidente" loading="lazy"></span>
+          <h3 class="formu__inst" id="formu-inst">Institución</h3>
+          <span class="formu__linea" aria-hidden="true"></span>
+          <dl class="formu__datos">
+            ${C.CONTACTO_UAO.map((d) => `<div><dt>${d.t}</dt><dd>${icono(d.i)}${d.href ? `<a href="${d.href}">${d.p}</a>` : `<span>${d.p}</span>`}</dd></div>`).join('')}
+          </dl>
+        </aside>
+        <div class="formu__panel">
+          <h2 class="formu__titulo" data-pregunta-titulo>Cuéntanos qué tienes en mente.</h2>
+          <p class="formu__sub">Pedimos únicamente lo indispensable para comprender tu necesidad y canalizarla.</p>
+          <div class="campo-f campo-f--check">
+            <label><input type="checkbox" name="autoriza" required> <span>Autorizo el <a href="${C.POLITICAS[1].href}">tratamiento de mis datos personales</a></span></label>
+            <span class="error">Debes autorizar el tratamiento de tus datos para enviar la solicitud.</span>
+          </div>
           <div class="campo-f">
             <label for="nombre">Nombre completo</label>
             <input id="nombre" name="nombre" type="text" autocomplete="name" required>
@@ -730,13 +740,18 @@ ${intro({
             <input id="correo" name="correo" type="email" autocomplete="email" required>
             <span class="error">Escribe un correo válido.</span>
           </div>
+          <div class="campo-f">
+            <label for="facultad">Facultad o departamento</label>
+            <input id="facultad" name="facultad" type="text" autocomplete="organization" required>
+            <span class="error">Escribe tu facultad o departamento.</span>
+          </div>
+          <div class="campo-f">
+            <label for="idea" data-pregunta-etiqueta>Cuéntanos brevemente tu idea, necesidad o reto.</label>
+            <textarea id="idea" name="idea" required></textarea>
+            <span class="error">Cuéntanos al menos una frase para poder orientarte.</span>
+          </div>
+          <button class="formu__enviar" type="submit">Enviar solicitud<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
-        <div class="campo-f" data-sube style="--d:120ms">
-          <label for="facultad">Facultad o departamento</label>
-          <input id="facultad" name="facultad" type="text" autocomplete="organization" required>
-          <span class="error">Escribe tu facultad o departamento.</span>
-        </div>
-        <div class="acciones" data-sube style="--d:170ms"><button class="btn" type="submit">Enviar solicitud</button></div>
       </div>
     </div>
   </form>
