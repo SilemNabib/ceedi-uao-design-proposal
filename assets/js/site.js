@@ -5,63 +5,67 @@
   const anchoEtapas = matchMedia('(min-width: 900px)');
   const calma = matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* ---------- Menú móvil y submenú ---------- */
-  const nav = document.getElementById('menu');
-  const abrir = document.querySelector('.cabecera__abrir');
-  const cerrar = document.querySelector('.nav__cerrar');
+  /* ---------- Panel de menús de la Universidad (pantallas medianas y móviles) ---------- */
+  const nav = document.getElementById('menu-uao');
+  const abrir = document.querySelector('.uao__abrir');
+  const cerrar = document.querySelector('.uao__cerrar');
   const setMenu = (on) => {
     nav.classList.toggle('is-open', on);
     abrir.setAttribute('aria-expanded', String(on));
     document.body.style.overflow = on ? 'hidden' : '';
-    document.querySelectorAll('main, .pie, .cabecera__marca').forEach((el) => { el.inert = on; });
+    document.querySelectorAll('main, .pie, .subir, .uao__marca').forEach((el) => { el.inert = on; });
     if (on) cerrar.focus(); else abrir.focus();
   };
-  if (abrir && nav) {
+  if (abrir && nav && cerrar) {
     abrir.addEventListener('click', () => setMenu(true));
     cerrar.addEventListener('click', () => setMenu(false));
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('is-open')) setMenu(false); });
   }
-  document.querySelectorAll('.nav__grupo').forEach((grupo) => {
+
+  /* ---------- Menús desplegables: los de la Universidad y "Qué hacemos" en la barra de secciones ---------- */
+  const grupos = [...document.querySelectorAll('[data-grupo]')];
+  const cierra = (g) => { g.classList.remove('is-open'); g.querySelector('button').setAttribute('aria-expanded', 'false'); };
+  grupos.forEach((grupo) => {
     const boton = grupo.querySelector('button');
     boton.addEventListener('click', () => {
       const on = !grupo.classList.contains('is-open');
+      grupos.forEach((g) => { if (g !== grupo) cierra(g); });
       grupo.classList.toggle('is-open', on);
       boton.setAttribute('aria-expanded', String(on));
     });
-    addEventListener('click', (e) => {
-      if (!grupo.contains(e.target) && grupo.classList.contains('is-open')) {
-        grupo.classList.remove('is-open');
-        boton.setAttribute('aria-expanded', 'false');
-      }
-    });
-    addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && grupo.classList.contains('is-open')) {
-        grupo.classList.remove('is-open');
-        boton.setAttribute('aria-expanded', 'false');
-        boton.focus();
-      }
-    });
+  });
+  addEventListener('click', (e) => grupos.forEach((g) => { if (!g.contains(e.target) && g.classList.contains('is-open')) cierra(g); }));
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const abierto = grupos.find((g) => g.classList.contains('is-open'));
+    if (abierto) { cierra(abierto); abierto.querySelector('button').focus(); }
   });
 
-  /* ---------- La cabecera se aparta al bajar y vuelve al subir ---------- */
-  const cabecera = document.querySelector('.cabecera');
-  if (cabecera) {
-    let ultimo = scrollY;
-    let pendiente = false;
-    addEventListener('scroll', () => {
-      if (pendiente) return;
-      pendiente = true;
-      requestAnimationFrame(() => {
-        const y = scrollY;
-        const baja = y > ultimo && y > 260;
-        const abierto = cabecera.querySelector('.nav__grupo.is-open') || nav?.classList.contains('is-open');
-        if (!abierto) cabecera.classList.toggle('is-oculta', baja);
-        ultimo = y;
-        pendiente = false;
-      });
-    }, { passive: true });
-    cabecera.addEventListener('focusin', () => cabecera.classList.remove('is-oculta'));
-  }
+  /* ---------- Barra de secciones del CEEDi en móvil: se abre como lista ---------- */
+  const subnav = document.querySelector('.subnav');
+  const subnavBoton = subnav?.querySelector('.subnav__abrir');
+  subnavBoton?.addEventListener('click', () => {
+    const on = !subnav.classList.contains('is-open');
+    subnav.classList.toggle('is-open', on);
+    subnavBoton.setAttribute('aria-expanded', String(on));
+  });
+
+  /* ---------- Al bajar, la cabecera se compacta (como en uao.edu.co) y aparece "volver arriba" ---------- */
+  const cabecera = document.querySelector('.uao');
+  const subir = document.querySelector('.subir');
+  let pendiente = false;
+  const alBajar = () => {
+    const y = scrollY;
+    cabecera?.classList.toggle('is-compacta', y > 40);
+    subir?.classList.toggle('is-visible', y > 600);
+    pendiente = false;
+  };
+  addEventListener('scroll', () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(alBajar);
+  }, { passive: true });
+  alBajar();
 
   /* ---------- Las tres puertas y las etapas: el arco que se abre ---------- */
   const acordeon = (raiz, itemSel, botonSel, conHover, ancho) => {
@@ -107,8 +111,7 @@
     if (!('IntersectionObserver' in window) || calma.matches) {
       entradas.forEach((el) => el.classList.add('is-in'));
     } else {
-      // Una imagen perezosa recortada al 100 % nunca empieza a cargar: el navegador la da por invisible.
-      // Por eso las fotos que se abren al entrar se piden desde el inicio.
+      // Las fotos que aparecen al entrar se piden desde el inicio para que ya estén listas cuando llega el scroll.
       document.querySelectorAll('[data-abre] img').forEach((img) => { img.loading = 'eager'; });
       const io = new IntersectionObserver((lista) => {
         for (const e of lista) {
@@ -116,7 +119,7 @@
           e.target.classList.add('is-in');
           io.unobserve(e.target);
         }
-      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+      }, { rootMargin: '0px 0px 8% 0px', threshold: 0 }); // arranca justo antes de entrar en pantalla
       entradas.forEach((el) => io.observe(el));
       // Red de seguridad: nada en pantalla queda oculto si el observador no dispara.
       addEventListener('load', () => setTimeout(() => {
@@ -124,7 +127,7 @@
           const r = el.getBoundingClientRect();
           if (r.top < innerHeight && r.bottom > 0) el.classList.add('is-in');
         });
-      }, 1800));
+      }, 800));
     }
   }
 

@@ -33,11 +33,32 @@ export const REDES = [
   { id: 'linkedin', nombre: 'LinkedIn', href: 'https://www.linkedin.com/school/universidadautonomadeoccidente' },
 ];
 
-// Contacto de la Universidad. El del CEEDi (CONTACTO, más abajo) sigue por confirmar.
+// Contacto de la Universidad, en las cuatro columnas del pie de uao.edu.co. El del CEEDi (CONTACTO, más abajo) sigue por confirmar.
 export const CONTACTO_UAO = [
-  { i: 'telefono', t: 'PBX', p: '(602) 3188000', href: 'tel:+576023188000' },
+  { i: 'telefono', t: 'Teléfono', p: 'PBX: (602) 3188000', href: 'tel:+576023188000' },
   { i: 'correo', t: 'Correo', p: 'buzon@uao.edu.co', href: 'mailto:buzon@uao.edu.co' },
-  { i: 'ubicacion', t: 'Dirección', p: 'Cll 25 # 115-85 Km 2 Vía Cali - Jamundí.<br>Cali, Colombia. Código Postal: 760030' },
+  { i: 'ubicacion', t: 'Dirección', p: 'Cll 25 # 115-85 Km 2 Vía Cali - Jamundí' },
+  { i: 'documento', t: 'Ciudad', p: 'Cali, Colombia Código Postal: 760030' },
+];
+
+// Cabecera institucional: atajos y menús tal cual aparecen en uao.edu.co (noviembre de 2026).
+// En el sitio real esta cabecera la pone el portal; aquí se replica para que el micrositio se vea en su contexto.
+export const UAO_ATAJOS = [
+  { t: 'CRAI Biblioteca', href: 'https://www.uao.edu.co/biblioteca/' },
+  { t: 'Guía de matrícula', href: 'https://www.uao.edu.co/guia-de-matricula/' },
+  { t: 'Pago en línea', href: 'https://apps.uao.edu.co/apex/f?p=191:2::::::' },
+  { t: 'Citas financieras', href: 'https://sitios.uao.edu.co/financiacion/' },
+  { t: 'Saber Pro', href: 'https://saberpro.uao.edu.co/' },
+];
+const u = (t, ruta) => ({ t, href: ruta.startsWith('http') ? ruta : `https://www.uao.edu.co/${ruta}` });
+export const UAO_MENU = [
+  { t: 'Institución', items: [u('Nuestro Campus', 'nuestro-campus/'), u('Información institucional', 'informacion-institucional/'), u('Documentos Institucionales', 'documentos-institucionales/'), u('Símbolos institucionales', 'simbolos/'), u('Órganos de Gobierno Institucionales', 'organos-de-gobierno-institucionales/'), u('Planeación y Efectividad Institucional', 'planeacion-y-efectividad-institucional-2/'), u('Directorio General', 'directorio-general/'), u('Lista de profesores', 'lista-de-docentes/'), u('Transparencia y acceso a la información pública', 'transparencia-y-acceso-a-la-informacion-publica/'), u('Trabajo de Grado', 'trabajo-de-grado-uao'), u('PQRS', 'pqrs/')] },
+  { t: 'Oferta académica', items: [u('¿En qué estás interesado?', 'oferta-academica/'), u('Pregrados', 'oferta-academica/pregrado/'), u('Posgrados', 'oferta-academica/posgrados/'), u('Tecnologías', 'tecnologia/'), u('Educación para la Vida', 'oferta-academica/educacion-continua/'), u('UAO Virtual', 'https://estudiarvirtual.uao.edu.co/'), u('Consultorías y asesorías empresariales', 'consultoria-y-asesoria/')] },
+  { t: 'Cómo inscribirse', items: [u('Inscripción para pregrado', 'pregrado/inscripcion-online-pregrado-y-tecnologia/'), u('Inscripción para posgrado', 'inscripcion-online-posgrado/'), u('Inscripción para educación para la Vida', 'inscripcion-online-educacion-continua/'), u('Becas y financiación', 'becas-y-financiacion/'), u('Opciones de transferencia y cambio', 'opciones-de-transferencia-y-cambio/')] },
+  { t: 'Experimenta la UAO', items: [u('¿Por qué estudiar en la UAO?', 'razones-para-estudiar-en-la-uao/'), u('Opciones de internacionalización', 'opciones-de-internacionalizacion/'), u('Laboratorios UAO', 'uao-labs/laboratorios-uao/'), u('Nuestros medios UAO', 'nuestros-medios-uao/'), u('Nuestros museos UAO', 'nuestros-museos/'), u('Actividades culturales y artísticas', 'arte-y-cultura/'), u('Noticias', 'noticias/'), u('Agenda de eventos', 'evento/')] },
+  { t: 'Investigaciones', items: [u('Investigaciones', 'investigaciones-uao/'), u('¿Quiénes somos?', 'quienes-somos-vicerrectoria-de-investigaciones-innovacion-y-emprendimiento/'), u('Servicios', 'servicios-investigaciones/'), u('Investigadores', 'investigadores-uao/')] },
+  { t: 'Servicios', items: [u('Acceso a Portal Único de Aplicaciones, PUA', 'pua'), u('Servicios institucionales', 'servicios-institucionales/'), u('Servicios Financieros', 'becas-y-financiacion/'), u('Acceso al Portal del Profesor', 'https://sitios.uao.edu.co/docentes/'), u('Acceso a Portal Estudiantil', 'https://apps.uao.edu.co/apex/f?p=900'), u('Ingreso a más portales', 'ingreso-a-portales/'), u('Centros de servicio', 'centros-de-servicio/'), u('Procesos y trámites administrativos', 'procesos-y-tramites-administrativos/'), u('Centro de Idiomas', 'https://idiomas.uao.edu.co/oferta-para-externos/'), u('Egresados', 'egresados/')] },
+  { t: 'Bienestar Universitario', items: [u('Arte y Cultura', 'arte-y-cultura/'), u('Bienestar en Línea', 'https://estudiarvirtual.uao.edu.co/bienestar/'), u('CASA', 'casa/'), u('Centro para la Excelencia Académica', 'https://bienestar.uao.edu.co/centro-para-la-excelencia-academica/'), u('Deporte y Recreación', 'deporte-y-recreacion/'), u('Desarrollo Humano', 'formacion-integral/'), u('Información y Políticas', 'informacion-y-politicas/')] },
 ];
 
 export const POLITICAS = [
@@ -75,11 +96,11 @@ export const PUERTAS = [
 
 // MUESTRA: recursos destacados de la home (máximo tres)
 export const DESTACADOS = [
-  { titulo: 'Cómo redactar resultados de aprendizaje', tipo: 'Guía', icono: 'guia', m: R, mi: C, href: 'recursos.html#diseno-y-ensenanza',
+  { titulo: 'Cómo redactar resultados de aprendizaje', tipo: 'Guía', icono: 'guia', href: 'recursos.html#diseno-y-ensenanza',
     texto: 'Pasos y ejemplos para expresar lo que esperas que tus estudiantes aprendan.' },
-  { titulo: 'Plantilla para planear una sesión híbrida', tipo: 'Plantilla', icono: 'plantilla', m: V, mi: C, href: 'recursos.html#multimodalidad',
+  { titulo: 'Plantilla para planear una sesión híbrida', tipo: 'Plantilla', icono: 'plantilla', href: 'recursos.html#multimodalidad',
     texto: 'Coordina lo que ocurre en el salón y lo que ocurre en línea.' },
-  { titulo: 'Criterios para usar IA con intención pedagógica', tipo: 'Orientación', icono: 'orientacion', m: P, mi: V, href: 'recursos.html#inteligencia-artificial',
+  { titulo: 'Criterios para usar IA con intención pedagógica', tipo: 'Orientación', icono: 'orientacion', href: 'recursos.html#inteligencia-artificial',
     texto: 'Preguntas para decidir cuándo la IA aporta al aprendizaje y cuándo no.' },
 ];
 
@@ -110,9 +131,9 @@ export const ETAPAS_EXP = [
 
 // MUESTRA
 export const RELACIONADOS_EXP = [
-  { titulo: 'Cómo redactar resultados de aprendizaje', tipo: 'Guía', icono: 'guia', m: R, mi: C, href: 'recursos.html#diseno-y-ensenanza', texto: 'Pasos y ejemplos para expresar lo que esperas que tus estudiantes aprendan.' },
-  { titulo: 'Plantilla para planear una sesión', tipo: 'Plantilla', icono: 'plantilla', m: V, mi: C, href: 'recursos.html#diseno-y-ensenanza', texto: 'Organiza propósito, actividades, tiempos y evaluación en una sola página.' },
-  { titulo: 'Actividades para una participación activa', tipo: 'Orientación', icono: 'orientacion', m: P, mi: V, href: 'recursos.html#diseno-y-ensenanza', texto: 'Ideas para que tus estudiantes discutan, practiquen y tomen decisiones en clase.' },
+  { titulo: 'Cómo redactar resultados de aprendizaje', tipo: 'Guía', icono: 'guia', href: 'recursos.html#diseno-y-ensenanza', texto: 'Pasos y ejemplos para expresar lo que esperas que tus estudiantes aprendan.' },
+  { titulo: 'Plantilla para planear una sesión', tipo: 'Plantilla', icono: 'plantilla', href: 'recursos.html#diseno-y-ensenanza', texto: 'Organiza propósito, actividades, tiempos y evaluación en una sola página.' },
+  { titulo: 'Actividades para una participación activa', tipo: 'Orientación', icono: 'orientacion', href: 'recursos.html#diseno-y-ensenanza', texto: 'Ideas para que tus estudiantes discutan, practiquen y tomen decisiones en clase.' },
 ];
 
 export const CATEGORIAS_REC = [
@@ -151,29 +172,29 @@ export const HERRAMIENTAS = [
   { i: 'evaluacion', t: 'Evaluación en línea', p: 'Configura rúbricas y retroalimentación para tus estudiantes.' },
 ];
 
-const persona = (rol, frase, c, t) => ({ nombre: 'Nombre y apellido', rol, frase, c, t });
+const persona = (rol, frase) => ({ nombre: 'Nombre y apellido', rol, frase });
 // MUESTRA: nombres, fotografías, roles y frases los entrega el CEEDi
 export const EQUIPO = {
   experiencias: [
-    persona('Diseño instruccional', 'Te acompaña a estructurar cursos y módulos a partir de lo que esperas que tus estudiantes aprendan.', R, C),
-    persona('Diseño de experiencias', 'Revisa contigo actividades y metodologías para favorecer la participación activa.', P, V),
-    persona('Asesoría en modalidades', 'Explora contigo alternativas presenciales, virtuales, híbridas o multimodales.', V, C),
+    persona('Diseño instruccional', 'Te acompaña a estructurar cursos y módulos a partir de lo que esperas que tus estudiantes aprendan.'),
+    persona('Diseño de experiencias', 'Revisa contigo actividades y metodologías para favorecer la participación activa.'),
+    persona('Asesoría en modalidades', 'Explora contigo alternativas presenciales, virtuales, híbridas o multimodales.'),
   ],
   recursos: [
-    persona('Diseño gráfico educativo', 'Organiza tus contenidos en materiales visuales claros.', V, C),
-    persona('Producción audiovisual', 'Convierte tus ideas en piezas con imagen, sonido y narrativa.', R, C),
-    persona('Desarrollo interactivo', 'Crea recursos para explorar, practicar y tomar decisiones.', P, V),
+    persona('Diseño gráfico educativo', 'Organiza tus contenidos en materiales visuales claros.'),
+    persona('Producción audiovisual', 'Convierte tus ideas en piezas con imagen, sonido y narrativa.'),
+    persona('Desarrollo interactivo', 'Crea recursos para explorar, practicar y tomar decisiones.'),
   ],
   cultura: [
-    persona('Apropiación tecnológica', 'Te orienta en el uso de las herramientas institucionales.', P, V),
-    persona('IA en educación', 'Explora contigo criterios para usar la IA con intención pedagógica.', V, C),
-    persona('Formación docente', 'Coordina talleres, cursos y espacios como Café Digital UAO.', R, C),
+    persona('Apropiación tecnológica', 'Te orienta en el uso de las herramientas institucionales.'),
+    persona('IA en educación', 'Explora contigo criterios para usar la IA con intención pedagógica.'),
+    persona('Formación docente', 'Coordina talleres, cursos y espacios como Café Digital UAO.'),
   ],
 };
 
 const rec = (titulo, tipo, texto) => {
-  const m = { Guía: ['guia', R, C], Plantilla: ['plantilla', V, C], Orientación: ['orientacion', P, V] }[tipo];
-  return { titulo, tipo, texto, icono: m[0], m: m[1], mi: m[2], href: '#' };
+  const icono = { Guía: 'guia', Plantilla: 'plantilla', Orientación: 'orientacion' }[tipo];
+  return { titulo, tipo, texto, icono, href: '#' };
 };
 // Las categorías son de la propuesta; los recursos son MUESTRA.
 export const BANCO = [

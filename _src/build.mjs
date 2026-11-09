@@ -3,14 +3,21 @@
 import { writeFileSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import * as C from './contenido.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
+// Huella del contenido: cada cambio en la hoja de estilos o el script cambia la URL y el navegador no usa una copia vieja.
+const huella = (ruta) => `${ruta}?v=${createHash('sha1').update(readFileSync(join(RAIZ, ruta))).digest('hex').slice(0, 8)}`;
+const CSS = huella('assets/css/site.css');
+const JS = huella('assets/js/site.js');
 
 /* ---------------- piezas de marca ---------------- */
-const ARCO = 'M491.82 7.79V238.13C491.82 242.43 488.34 245.91 484.04 245.91H428.38C424.11 245.91 420.03 244.16 417.1 241.06 374.18 195.67 313.34 167.36 245.91 167.36 178.48 167.36 117.64 195.67 74.72 241.06 71.79 244.16 67.71 245.91 63.45 245.91H7.79C3.48 245.91 0 242.43 0 238.13V7.79C0 3.49 3.48 0 7.79 0H484.04C488.34 0 491.82 3.49 491.82 7.79Z';
-const vineta = `<svg class="vineta" viewBox="0 0 491.82 245.91" aria-hidden="true"><path d="${ARCO}"/></svg>`;
-const flecha = (c = 'nav__flecha') => `<svg class="${c}" viewBox="0 0 12 8" fill="currentColor" aria-hidden="true"><path d="M.9 1h10.200a.6.6 0 0 1 .47.97L6.470 7.400a.6.6 0 0 1-.94 0L.430 1.970A.6.6 0 0 1 .9 1Z"/></svg>`;
+// Sin arcos: las subpáginas de uao.edu.co no los usan. Viñeta: un recuadro pequeño.
+const vineta = '<span class="vineta" aria-hidden="true"></span>';
+const casita = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 3.2 3.5 10.2v10.1h6.2v-6.3h4.6v6.3h6.2V10.2L12 3.2Z"/></svg>';
+const chevron = '<svg class="migas__sep" viewBox="0 0 8 12" width="7" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 1.5 6.5 6 2 10.5"/></svg>';
+const flecha = (c) => `<svg class="${c}" viewBox="0 0 12 8" fill="currentColor" aria-hidden="true"><path d="M.9 1h10.200a.6.6 0 0 1 .47.97L6.470 7.400a.6.6 0 0 1-.94 0L.430 1.970A.6.6 0 0 1 .9 1Z"/></svg>`;
 
 // Íconos: línea uniforme, esquinas curvas y puntas redondeadas (manual p. 46-47)
 const I = {
@@ -24,6 +31,7 @@ const I = {
   correo: '<rect x="5" y="9" width="34" height="26" rx="4"/><path d="M6 12l14 11.2c1.2.9 2.8.9 4 0L38 12"/>',
   ubicacion: '<path d="M22 40S9 27.7 9 18a13 13 0 0 1 26 0c0 9.7-13 22-13 22Z"/><circle cx="22" cy="18" r="5"/>',
   reloj: '<circle cx="22" cy="22" r="16"/><path d="M22 12v10l7 4"/>',
+  documento: '<rect x="9" y="5" width="26" height="34" rx="4"/><path d="M15 14h14M15 21h14M15 28h9"/>',
   telefono: '<path d="M14.500 6h-5C7.600 6 6 7.600 6 9.500 6 24.700 19.300 38 34.500 38c1.900 0 3.500-1.600 3.500-3.500v-5c0-1.200-.7-2.300-1.900-2.700l-6.800-2.300c-1-.3-2.200-.1-3 .7l-2.500 2.500c-4.300-2.200-7.800-5.700-10-10l2.500-2.500c.8-.8 1-2 .7-3l-.8-4C15.900 7 15.300 6 14.500 6Z"/>',
 };
 // Redes: las marcas de cada servicio, en plano y en el color del texto.
@@ -34,15 +42,8 @@ const RED = {
   youtube: '<path fill-rule="evenodd" d="M23.500 6.200a3 3 0 0 0-2.100-2.100C19.500 3.600 12 3.600 12 3.600s-7.500 0-9.400.5A3 3 0 0 0 .5 6.200C0 8.100 0 12 0 12s0 3.900.5 5.800a3 3 0 0 0 2.100 2.100c1.900.5 9.400.5 9.400.5s7.500 0 9.400-.5a3 3 0 0 0 2.100-2.100c.5-1.900.5-5.800.5-5.800s0-3.900-.5-5.800ZM9.600 15.600V8.400l6.200 3.600-6.200 3.600Z"/>',
   linkedin: '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.850 3.370-1.850 3.601 0 4.267 2.370 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065Zm1.782 13.019H3.555V9h3.564v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.200 24 24 23.227 24 22.271V1.729C24 .774 23.200 0 22.222 0h.003Z"/>',
 };
-const arcoPath = (e = 0) => {
-  const y = (v) => (v + e).toFixed(2);
-  return `M491.82 7.79V${y(238.13)}C491.82 ${y(242.43)} 488.34 ${y(245.91)} 484.04 ${y(245.91)}H428.38C424.11 ${y(245.91)} 420.03 ${y(244.16)} 417.1 ${y(241.06)} 374.18 ${y(195.67)} 313.34 ${y(167.36)} 245.91 ${y(167.36)} 178.48 ${y(167.36)} 117.64 ${y(195.67)} 74.72 ${y(241.06)} 71.79 ${y(244.16)} 67.71 ${y(245.91)} 63.45 ${y(245.91)}H7.79C3.48 ${y(245.91)} 0 ${y(242.43)} 0 ${y(238.13)}V7.79C0 3.49 3.48 0 7.79 0H484.04C488.34 0 491.82 3.49 491.82 7.79Z`;
-};
-// Un arco alargado hacia arriba (sin deformar la curva, manual p. 51) con un icono de linea adentro.
-const arcoIcono = (n, c, t, e = 190) => {
-  const H = 245.91 + e, s = 214, x = (491.82 - s) / 2, yy = (H - 78.55 - s) / 2 + 6;
-  return `<svg class="arco-icono" viewBox="0 0 491.82 ${H.toFixed(2)}" aria-hidden="true"><path style="fill:${c}" d="${arcoPath(e)}"/><svg x="${x.toFixed(1)}" y="${yy.toFixed(1)}" width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="stroke:${t}">${I[n]}</svg></svg>`;
-};
+// Icono de línea dentro de un recuadro blanco, como los accesos de servicios de uao.edu.co.
+const cajaIcono = (n, c = '') => `<span class="caja-icono${c ? ' ' + c : ''}" aria-hidden="true"><svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg></span>`;
 const icono = (n) => `<svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
 
 // Ilustraciones: descomplicadas, sencillas, estilizadas, inteligibles (manual p. 44)
@@ -62,78 +63,95 @@ const ILUS = {
     <path d="M104 128l10 46 10-14 16 20 10-8-16-20 16-8-46-16Z"/><path d="M70 190h100"/></svg>`,
 };
 
-/* ---------------- plantilla de página ---------------- */
+/* ---------------- plantilla de página ----------------
+   Sigue el modelo de las subpáginas de uao.edu.co (p. ej. Trabajo de Grado):
+   cabecera institucional → cabezote con migas → barra de secciones del micrositio → contenido → cierre → pie. */
 const img = (src, alt, w, h, extra = 'loading="lazy" decoding="async"') => `<img src="${src}" width="${w}" height="${h}" alt="${alt}" ${extra}>`;
 const P = (id) => C.PICS[id];
 const foto = (id, extra) => { const p = P(id); return img(p.src, p.alt, p.w, p.h, extra); };
+const sinAlt = (html) => html.replace(/alt="[^"]*"/, 'alt=""');
+const actual = (si) => (si ? ' aria-current="page"' : '');
 
-const cabecera = (activa) => `
+// La cabecera de la Universidad: atajos arriba, marca y menús institucionales. Se compacta al bajar, como en el portal.
+const cabecera = () => `
 <a class="saltar" href="#contenido">Saltar al contenido</a>
-<header class="cabecera">
-  <a class="cabecera__marca" href="index.html"><img src="assets/logo/uao-ceedi.svg" width="265" height="56" alt="uao, Centro de Excelencia Educativa Digital. Ir al inicio"></a>
-  <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="menu">Menú</button>
-  <nav class="nav" id="menu" aria-label="Principal">
-    <button class="nav__cerrar" type="button">Cerrar</button>
-    <ul>
-      <li><a class="nav__enlace" href="index.html"${activa === 'inicio' ? ' aria-current="page"' : ''}>Inicio</a></li>
-      <li class="nav__grupo${activa.startsWith('area') ? ' es-actual' : ''}">
-        <button type="button" aria-expanded="false" aria-controls="sub-hacemos">Qué hacemos ${flecha()}</button>
-        <ul class="submenu" id="sub-hacemos">
-          ${C.AREAS.map((a) => `<li><a href="${a.href}"${activa === 'area-' + a.id ? ' aria-current="page"' : ''}><strong style="--vineta:${a.color}">${vineta}${a.nombre}</strong><span>${a.menu}</span></a></li>`).join('')}
-        </ul>
-      </li>
-      <li><a class="nav__enlace" href="recursos.html"${activa === 'recursos' ? ' aria-current="page"' : ''}>Recursos</a></li>
-      <li><a class="nav__enlace" href="formacion.html"${activa === 'formacion' ? ' aria-current="page"' : ''}>Formación</a></li>
-      <li><a class="nav__enlace" href="ceedi.html"${activa === 'ceedi' ? ' aria-current="page"' : ''}>CEEDi</a></li>
-      <li><a class="btn" href="solicita-acompanamiento.html"${activa === 'solicita' ? ' aria-current="page"' : ''}>Solicita acompañamiento</a></li>
-    </ul>
-  </nav>
+<header class="uao" id="arriba">
+  <div class="uao__atajos">
+    <ul>${C.UAO_ATAJOS.map((a) => `<li><a href="${a.href}">${a.t}</a></li>`).join('')}</ul>
+  </div>
+  <div class="uao__barra">
+    <a class="uao__marca" href="https://www.uao.edu.co/"><img src="assets/logo/uao-rojo.svg" width="102" height="34" alt="Universidad Autónoma de Occidente. Ir a uao.edu.co"></a>
+    <button class="uao__abrir" type="button" aria-expanded="false" aria-controls="menu-uao">Menú</button>
+    <nav class="uao__nav" id="menu-uao" aria-label="Universidad Autónoma de Occidente">
+      <button class="uao__cerrar" type="button">Cerrar</button>
+      <ul>
+        ${C.UAO_MENU.map((m, i) => `
+        <li class="uao__grupo" data-grupo>
+          <button type="button" aria-expanded="false" aria-controls="uao-m${i}">${m.t}${flecha('uao__flecha')}</button>
+          <ul class="uao__sub" id="uao-m${i}">${m.items.map((it) => `<li><a href="${it.href}">${it.t}</a></li>`).join('')}</ul>
+        </li>`).join('')}
+      </ul>
+    </nav>
+  </div>
 </header>`;
 
-const enlacePie = ({ t, href }) => `<li><a href="${href}">${vineta}<span>${t}</span></a></li>`;
+// El menú del micrositio (propuesta, sección 3) en la barra de secciones que las subpáginas UAO ponen bajo el cabezote.
+const SECCIONES = [
+  { id: 'inicio', t: 'Inicio', href: 'index.html' },
+  { id: 'area', t: 'Qué hacemos' },
+  { id: 'recursos', t: 'Recursos', href: 'recursos.html' },
+  { id: 'formacion', t: 'Formación', href: 'formacion.html' },
+  { id: 'ceedi', t: 'CEEDi', href: 'ceedi.html' },
+  { id: 'solicita', t: 'Solicita acompañamiento', href: 'solicita-acompanamiento.html' },
+];
+const subnav = (activa) => `
+<nav class="subnav" aria-label="Secciones del CEEDi">
+  <button class="subnav__abrir" type="button" aria-expanded="false" aria-controls="subnav-lista">Secciones del CEEDi${flecha('subnav__flecha')}</button>
+  <ul class="subnav__lista" id="subnav-lista">
+    ${SECCIONES.map((s) => (s.id === 'area' ? `
+    <li class="subnav__grupo${activa.startsWith('area') ? ' es-actual' : ''}" data-grupo>
+      <button type="button" aria-expanded="false" aria-controls="subnav-areas">${s.t}${flecha('subnav__flecha')}</button>
+      <ul class="subnav__sub" id="subnav-areas">${C.AREAS.map((a) => `<li><a href="${a.href}"${actual(activa === 'area-' + a.id)}>${a.nombre}</a></li>`).join('')}</ul>
+    </li>` : `
+    <li><a href="${s.href}"${actual(activa === s.id)}>${s.t}</a></li>`)).join('')}
+  </ul>
+</nav>`;
 
-// Un solo campo de color y una sola marca: el espacio separa las filas. Cierra con la franja roja y el domo que devuelve al inicio.
+const MAPA = [
+  { t: 'Inicio', href: 'index.html' },
+  ...C.AREAS.map((a) => ({ t: a.nombre, href: a.href })),
+  { t: 'Recursos', href: 'recursos.html' },
+  { t: 'Formación', href: 'formacion.html' },
+  { t: 'CEEDi', href: 'ceedi.html' },
+  { t: 'Solicita acompañamiento', href: 'solicita-acompanamiento.html' },
+];
+const subir = '<svg viewBox="0 0 12 8" width="14" height="9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 6.5 6 2l4.5 4.5"/></svg>';
+
+// Pie con el orden de uao.edu.co: redes, cuatro datos de contacto, una fila de enlaces, marca con texto legal y franja de políticas.
 const pie = () => `
 <footer class="pie">
-  <div class="pie__cuerpo">
-    <div class="pie__cabeza">
-      <a class="pie__marca" href="index.html"><img src="assets/logo/uao-ceedi-crema.svg" width="620" height="131" alt="uao, Centro de Excelencia Educativa Digital. Ir al inicio" loading="lazy"></a>
-      <ul class="pie__redes" aria-label="Redes sociales de la Universidad">
-        ${C.REDES.map((r) => `<li><a class="pie__red" href="${r.href}" aria-label="${r.nombre}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${RED[r.id]}</svg></a></li>`).join('')}
-      </ul>
-    </div>
+  <ul class="pie__redes" aria-label="Redes sociales de la Universidad">
+    ${C.REDES.map((r) => `<li><a class="pie__red" href="${r.href}" aria-label="${r.nombre}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${RED[r.id]}</svg></a></li>`).join('')}
+  </ul>
+  <ul class="pie__contacto">
+    ${C.CONTACTO_UAO.map((d) => `<li>${icono(d.i)}<span class="sr">${d.t}: </span>${d.href ? `<a href="${d.href}">${d.p}</a>` : `<span>${d.p}</span>`}</li>`).join('')}
+  </ul>
+  <nav class="pie__micro" aria-label="Mapa del micrositio">
+    <strong>Micrositio CEEDi:</strong>
+    <ul>${MAPA.map((l) => `<li><a href="${l.href}">${l.t}</a></li>`).join('')}</ul>
+  </nav>
+  <div class="pie__institucion">
+    <a class="pie__marca" href="https://www.uao.edu.co/"><img src="assets/logo/uao-crema.svg" width="132" height="43" alt="Universidad Autónoma de Occidente" loading="lazy"></a>
     <div>
-      <h2 class="pie__titulo">Universidad Autónoma de Occidente</h2>
-      <ul class="pie__contacto">
-        ${C.CONTACTO_UAO.map((d) => `<li class="pie__dato">${icono(d.i)}<div><strong>${d.t}</strong>${d.href ? `<a href="${d.href}">${d.p}</a>` : `<span>${d.p}</span>`}</div></li>`).join('')}
-      </ul>
-    </div>
-    <nav class="pie__mapa" aria-label="Mapa del micrositio">
-      <div class="pie__fila">
-        <h2>Qué hacemos</h2>
-        <ul>${C.AREAS.map((a) => enlacePie({ t: a.nombre, href: a.href })).join('')}</ul>
-      </div>
-      <div class="pie__fila">
-        <h2>Micrositio</h2>
-        <ul>${[
-          { t: 'Recursos', href: 'recursos.html' },
-          { t: 'Formación', href: 'formacion.html' },
-          { t: 'CEEDi', href: 'ceedi.html' },
-          { t: 'Solicita acompañamiento', href: 'solicita-acompanamiento.html' },
-        ].map(enlacePie).join('')}</ul>
-      </div>
-    </nav>
-    <div class="pie__institucion">
-      <p class="pie__centro">Centro de Excelencia Educativa Digital, Unidad de Cultura Digital.<br><a class="pie__sitio" href="https://www.uao.edu.co">uao.edu.co</a></p>
-      <p class="pie__norma">${C.LEGAL}</p>
-      <p class="pie__creditos">${C.CREDITOS}</p>
+      <p>${C.LEGAL}</p>
+      <p class="pie__creditos">Centro de Excelencia Educativa Digital, Unidad de Cultura Digital. ${C.CREDITOS}</p>
     </div>
   </div>
   <div class="pie__banda">
-    <a class="pie__subir" href="#contenido"><span class="sr">Volver arriba</span>${flecha('pie__subir-flecha')}</a>
     <ul>${C.POLITICAS.map((p) => `<li><a href="${p.href}">${p.t}</a></li>`).join('')}</ul>
   </div>
-</footer>`;
+</footer>
+<a class="subir" href="#arriba"><span class="sr">Volver arriba</span>${subir}</a>`;
 
 const pagina = ({ archivo, titulo, descripcion, activa, cuerpo }) => {
   const html = `<!DOCTYPE html>
@@ -143,19 +161,19 @@ const pagina = ({ archivo, titulo, descripcion, activa, cuerpo }) => {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${titulo}</title>
 <meta name="description" content="${descripcion}">
-<meta name="theme-color" content="#FF051E">
+<meta name="theme-color" content="#8A1428">
 <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/dm-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="${CSS}">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
-${cabecera(activa)}
+${cabecera()}
 <main id="contenido">
-${cuerpo}
+${cuerpo.replace('<!--subnav-->', subnav(activa))}
 </main>
 ${pie()}
-<script src="assets/js/site.js" defer></script>
+<script src="${JS}" defer></script>
 </body>
 </html>
 `;
@@ -166,24 +184,52 @@ ${pie()}
 /* ---------------- componentes ---------------- */
 const lineas = (arr) => arr.map((t, i) => `<span class="line"><span data-line style="--i:${i}">${t}</span></span>`).join('');
 
-// Portada: el arco a escala máxima, con la foto contenida y el domo que entrega a la sección siguiente.
-const portada = ({ color, h1, clase = 'display', texto, acciones, fotoId, domo = '46%', domoH, foco, vt }) => `
-<section class="portada c-${color}" style="--dome-hero:${domo};--dome-h:${domoH}">
-  <div class="portada__campo"${vt ? ` style="view-transition-name:${vt}"` : ''}></div>
-  <div class="portada__titulo">
-    <h1 class="${clase} lines">${lineas(h1)}</h1>
+// Cabezote, como las páginas internas de uao.edu.co: foto con velo, migas en píldora, título blanco con la línea roja
+// y el nombre del centro debajo. Las migas parten del portal de la Universidad y pasan por el inicio del micrositio.
+// clase: 'cabezote--completa' pone la foto a todo el ancho, como en el portal (solo para fotos en alta resolución).
+const cabezote = ({ h1, migas = [], fotoId, foco, vt, clase = '', lema = 'Centro de Excelencia<br>Educativa Digital' }) => {
+  const ruta = [{ t: 'CEEDi', href: 'index.html' }, ...migas];
+  return `
+<section class="cabezote${clase ? ' ' + clase : ''}">
+  <div class="cabezote__fondo"${vt ? ` style="view-transition-name:${vt}"` : ''}>
+    <figure class="cabezote__foto"${foco ? ` style="--foco-img:${foco}"` : ''}>${sinAlt(foto(fotoId, 'fetchpriority="high" decoding="async"'))}</figure>
   </div>
-  <div class="portada__texto">
-    <p class="lead" data-llega style="--d:420ms">${texto}</p>
-    <div class="acciones" data-llega style="--d:500ms">${acciones}</div>
+  <nav class="migas" aria-label="Migas de pan">
+    <ol>
+      <li><a href="https://www.uao.edu.co/">${casita}<span class="sr">Universidad Autónoma de Occidente</span></a></li>
+      ${ruta.map((m, i) => `<li>${chevron}${i === ruta.length - 1 ? `<span aria-current="page">${m.t}</span>` : `<a href="${m.href}">${m.t}</a>`}</li>`).join('')}
+    </ol>
+  </nav>
+  <div class="cabezote__texto">
+    <h1 class="lines">${lineas(h1)}</h1>
+    <span class="cabezote__linea" aria-hidden="true" data-llega style="--d:360ms"></span>
+    <p class="cabezote__lema" data-llega style="--d:420ms">${lema}</p>
   </div>
-  ${fotoId ? `<figure class="portada__foto"${foco ? ` style="--foco-img:${foco}"` : ''}>${foto(fotoId, 'fetchpriority="high" decoding="async"')}</figure>` : ''}
-  <div class="domo portada__domo"></div>
+</section>
+<!--subnav-->`;
+};
+
+const intro = ({ texto, acciones }) => `
+<section class="intro" aria-label="Presentación">
+  <p class="intro__texto" data-sube>${texto}</p>
+  ${acciones ? `<div class="acciones intro__acciones" data-sube style="--d:80ms">${acciones}</div>` : ''}
 </section>`;
+
+// Encabezado de sección centrado, como en uao.edu.co: título, la línea roja y su descripción. La acción cierra la sección.
+const cabSeccion = ({ id, titulo, texto }) => `
+  <div class="cab-seccion">
+    <h2 class="titulo" id="${id}" data-sube>${titulo}</h2>
+    <span class="cab-seccion__linea" aria-hidden="true"></span>
+    ${texto ? `<p data-sube style="--d:60ms">${texto}</p>` : ''}
+  </div>`;
+const pieSeccion = (acciones) => `<div class="acciones pie-seccion" data-sube>${acciones}</div>`;
+// Debajo del encabezado, dos columnas que arrancan a la misma altura: foto a la izquierda, contenido a la derecha.
+const dos = (izq, der) => `<div class="rejilla dos">${izq}${der}</div>`;
+const fotoDos = (id, d = 0) => `<figure class="dos__foto caja foto-fondo" data-abre style="--d:${d}ms">${foto(id)}</figure>`;
 
 const filaRecurso = (r, i = 0) => `
 <li class="recurso" data-fila style="--d:${i * 70}ms">
-  ${arcoIcono(r.icono, r.m, r.mi)}
+  ${cajaIcono(r.icono)}
   <div>
     <div class="recurso__cab"><h3>${r.titulo}</h3><span class="recurso__tipo">${r.tipo}</span></div>
     <p>${r.texto}</p>
@@ -191,57 +237,52 @@ const filaRecurso = (r, i = 0) => `
   </div>
 </li>`;
 
-const cierre = ({ titulo, texto, pregunta, boton = 'Solicitar acompañamiento', href = 'solicita-acompanamiento.html', fotoId = 'campus-puente' }) => `
+// Cierre: la tarjeta de contacto con sello que las subpáginas UAO ponen antes del pie, aquí con la acción principal.
+const cierre = ({ titulo, texto, pregunta, boton = 'Solicitar acompañamiento', href = 'solicita-acompanamiento.html' }) => `
 <section class="cierre" aria-labelledby="cierre-t">
-  <div class="cierre__lado cierre__lado--izq" data-abre>${foto(fotoId).replace(/alt="[^"]*"/, 'alt=""')}</div>
-  <div class="cierre__tile arco${pregunta ? ' cierre__tile--breve' : ''}" data-sube>
-    <h2 class="titulo" id="cierre-t">${titulo}</h2>
-    ${pregunta ? `<p class="cierre__pregunta">${pregunta}</p>` : ''}
+  <div class="cierre__tarjeta" data-sube>
+    <span class="cierre__sello"><img src="assets/logo/uao-ceedi.svg" width="265" height="56" alt="" loading="lazy"></span>
+    <h2 class="cierre__titulo" id="cierre-t">${titulo}</h2>
+    <span class="cab-seccion__linea" aria-hidden="true"></span>
+    ${pregunta ? `<p class="cierre__texto">${pregunta}</p>` : ''}
     ${texto ? `<p class="cierre__texto">${texto}</p>` : ''}
     <div class="acciones"><a class="btn" href="${href}">${boton}</a></div>
   </div>
-  <div class="cierre__lado cierre__lado--der" data-sube style="--d:90ms"></div>
 </section>`;
 
 const perfiles = (lista) => `<ul class="perfiles">${lista.map((p, i) => `
   <li class="perfil" data-sube style="--d:${i * 80}ms">
-    ${arcoIcono('persona', p.c, p.t, 110)}
-    <h4>${p.nombre}</h4>
-    <span class="perfil__rol">${p.rol}</span>
-    <p>${p.frase}</p>
+    ${cajaIcono('persona', 'perfil__foto')}
+    <div>
+      <h4>${p.nombre}</h4>
+      <span class="perfil__rol">${p.rol}</span>
+      <p>${p.frase}</p>
+    </div>
   </li>`).join('')}</ul>`;
 
-const equipo = ({ intro, lista }) => `
+const equipo = ({ intro: texto, lista }) => `
 <section class="seccion" aria-labelledby="equipo-t">
-  <div class="rejilla equipo__cab">
-    <h2 class="titulo" id="equipo-t" data-sube>Conoce a nuestro equipo</h2>
-    <div data-sube style="--d:80ms">
-      <p>${intro}</p>
-      <div class="acciones"><a class="btn btn--ghost" href="ceedi.html#equipo">Conoce al equipo</a></div>
-    </div>
-  </div>
+  ${cabSeccion({ id: 'equipo-t', titulo: 'Conoce a nuestro equipo', texto })}
   ${perfiles(lista)}
+  ${pieSeccion('<a class="btn btn--secundario" href="ceedi.html#equipo">Conoce al equipo</a>')}
 </section>`;
 
-const etapas = ({ id, titulo, intro, lista }) => `
+const etapas = ({ id, titulo, intro: texto, lista }) => `
 <section class="seccion" aria-labelledby="${id}">
-  <div class="rejilla etapas__intro">
-    <h2 class="titulo" id="${id}" data-sube>${titulo}</h2>
-    <p data-sube style="--d:80ms">${intro}</p>
-  </div>
-  <div class="etapas arco" data-etapas data-sube style="--d:140ms">
+  ${cabSeccion({ id, titulo, texto })}
+  <div class="etapas caja" data-etapas data-sube style="--d:140ms">
     ${lista.map((e, i) => `
     <div class="etapa${i === 0 ? ' is-open' : ''}" style="--c:${e.c};--t:${e.t}">
       <h3><button class="etapa__abrir" type="button" aria-expanded="${i === 0}">${e.nombre}</button></h3>
       <p>${e.texto}</p>
-      ${e.foto ? `<figure class="etapa__foto" style="--foco-img:${e.foco}">${foto(e.foto).replace(/alt="[^"]*"/, 'alt=""')}</figure>` : ''}
+      ${e.foto ? `<figure class="etapa__foto" style="--foco-img:${e.foco}">${sinAlt(foto(e.foto))}</figure>` : ''}
     </div>`).join('')}
   </div>
 </section>`;
 
 /* ---------------- 1. Inicio ---------------- */
 const puerta = (p, i) => `
-<article class="puerta puerta--${p.clase} arco${i === 0 ? ' is-open' : ''}" style="--c:${p.c};--t:${p.t};--vt:${p.vt};--d:${i * 90}ms" data-sube>
+<article class="puerta puerta--${p.clase} caja${i === 0 ? ' is-open' : ''}" style="--c:${p.c};--t:${p.t};--vt:${p.vt};--d:${i * 90}ms" data-sube>
   <div class="puerta__color">
     <h3><button class="puerta__abrir" type="button" aria-expanded="${i === 0}" aria-controls="puerta-${i}">${p.nombre}<span class="puerta__signo" aria-hidden="true"></span></button></h3>
     <div class="puerta__cuerpo" id="puerta-${i}">
@@ -258,65 +299,53 @@ pagina({
   descripcion: 'Acompañamos a los profesores UAO en el diseño de experiencias de aprendizaje, la creación de recursos educativos y la apropiación de tecnologías.',
   activa: 'inicio',
   cuerpo: `
-${portada({
-    color: 'rojo',
+${cabezote({
     h1: ['Potenciamos tus experiencias', 'de enseñanza con lo digital.'],
+    fotoId: 'campus-anfiteatro',
+    foco: '50% 42%',
+    clase: 'cabezote--completa cabezote--inicio',
+  })}
+${intro({
     texto: 'En el CEEDi acompañamos a los profesores UAO en el diseño de experiencias de aprendizaje, la creación de recursos educativos y la apropiación de tecnologías para fortalecer sus prácticas de enseñanza.',
     acciones: `<a class="btn" href="#que-necesitas">Encuentra lo que necesitas</a><a class="btn btn--secundario" href="solicita-acompanamiento.html">Solicita acompañamiento</a>`,
-    fotoId: 'campus-anfiteatro',
-    foco: '50% 38%',
-    domoH: '9.9vw',
   })}
 
-<section class="necesitas" id="que-necesitas" aria-labelledby="que-necesitas-t">
-  <h2 class="titulo necesitas__titulo" id="que-necesitas-t">¿Qué necesitas?</h2>
+<section class="seccion" id="que-necesitas" aria-labelledby="que-necesitas-t">
+  ${cabSeccion({ id: 'que-necesitas-t', titulo: '¿Qué necesitas?' })}
   <div class="puertas" data-puertas>
     ${C.PUERTAS.map(puerta).join('')}
   </div>
 </section>
 
 <section class="seccion seccion--pegada" aria-labelledby="recursos-t">
-  <div class="rejilla dos">
-    <div class="dos__izq">
-      <h2 class="titulo" id="recursos-t" data-sube>Encuentra algo útil para tu práctica.</h2>
-      <p data-sube style="--d:80ms">Explora guías, orientaciones, plantillas y recursos que pueden ayudarte a resolver necesidades concretas de enseñanza y aprendizaje.</p>
-      <div class="acciones" data-sube style="--d:140ms"><a class="btn" href="recursos.html">Ver todos los recursos</a></div>
-      <figure class="dos__foto arco foto-fondo" data-abre style="--d:120ms">${foto('profesora-explicando')}</figure>
-    </div>
-    <ul class="dos__der recursos-fila">
-      ${C.DESTACADOS.map(filaRecurso).join('')}
-    </ul>
-  </div>
+  ${cabSeccion({ id: 'recursos-t', titulo: 'Encuentra algo útil para tu práctica.', texto: 'Explora guías, orientaciones, plantillas y recursos que pueden ayudarte a resolver necesidades concretas de enseñanza y aprendizaje.' })}
+  ${dos(fotoDos('profesora-explicando'), `<ul class="dos__der recursos-fila">${C.DESTACADOS.map(filaRecurso).join('')}</ul>`)}
+  ${pieSeccion('<a class="btn" href="recursos.html">Ver todos los recursos</a>')}
 </section>
 
 <section class="campo campo--vino" aria-labelledby="formacion-t">
-  <div class="campo__arco arco" style="--outer:var(--crema)">
-    <div class="rejilla indice__cab">
-      <h2 class="titulo" id="formacion-t" data-sube>Continúa fortaleciendo tu práctica.</h2>
-      <p data-sube style="--d:80ms">Conoce las próximas oportunidades de formación, talleres y espacios del CEEDi para explorar nuevas posibilidades en tu práctica educativa.</p>
-    </div>
+  <div class="campo__cuerpo">
+    ${cabSeccion({ id: 'formacion-t', titulo: 'Continúa fortaleciendo tu práctica.', texto: 'Conoce las próximas oportunidades de formación, talleres y espacios del CEEDi para explorar nuevas posibilidades en tu práctica educativa.' })}
     <div class="indice" data-indice>
-      <div class="indice__lista">
-        <ul>
-          ${C.PROXIMAS.map((o, i) => `
-          <li data-fila style="--d:${i * 80}ms"><a class="indice__fila" href="formacion.html#proximas">
-            ${foto(o.foto, 'class="indice__mini" loading="lazy" decoding="async"').replace(/alt="[^"]*"/, 'alt=""')}
-            <span class="indice__fecha">${o.fechaCorta}</span>
-            <div><h3 class="indice__nombre">${o.nombre}</h3><span class="indice__detalle"><span class="indice__modo">${o.modo}.</span> ${o.texto}</span></div>
-          </a></li>`).join('')}
-        </ul>
-        <div class="acciones indice__pie" data-sube><a class="btn" href="formacion.html">Ver formación</a></div>
-      </div>
-      <figure class="indice__marco arco foto-fondo" data-abre aria-hidden="true">
-        ${C.PROXIMAS.map((o, i) => foto(o.foto, `loading="lazy" decoding="async"${i === 0 ? ' class="is-on"' : ''}`).replace(/alt="[^"]*"/, 'alt=""')).join('')}
+      <ul class="indice__lista">
+        ${C.PROXIMAS.map((o, i) => `
+        <li data-fila style="--d:${i * 80}ms"><a class="indice__fila" href="formacion.html#proximas">
+          ${sinAlt(foto(o.foto, 'class="indice__mini" loading="lazy" decoding="async"'))}
+          <span class="indice__fecha">${o.fechaCorta}</span>
+          <div><h3 class="indice__nombre">${o.nombre}</h3><span class="indice__detalle"><span class="indice__modo">${o.modo}.</span> ${o.texto}</span></div>
+        </a></li>`).join('')}
+      </ul>
+      <figure class="indice__marco caja foto-fondo" data-abre aria-hidden="true">
+        ${C.PROXIMAS.map((o, i) => sinAlt(foto(o.foto, `loading="lazy" decoding="async"${i === 0 ? ' class="is-on"' : ''}`))).join('')}
       </figure>
     </div>
+    ${pieSeccion('<a class="btn" href="formacion.html">Ver formación</a>')}
   </div>
 </section>
 
 <section class="banda" aria-labelledby="conoce-t" style="--foco-img:50% 58%">
   ${foto('campus-puente', 'class="deriva" loading="lazy" decoding="async"')}
-  <div class="banda__tarjeta arco" data-sube style="padding-bottom:clamp(52px,5.2vw,72px)">
+  <div class="banda__tarjeta caja" data-sube>
     <h2 class="titulo" id="conoce-t">Conoce el CEEDi</h2>
     <p>Quiénes somos, qué hacemos y quiénes te acompañan en la Universidad.</p>
     <div class="acciones"><a class="btn" href="ceedi.html">Conoce el CEEDi</a></div>
@@ -326,7 +355,6 @@ ${portada({
 ${cierre({
     titulo: '¿Tienes una idea y no sabes por dónde empezar?',
     texto: 'Cuéntanos qué quieres lograr. Te ayudamos a identificar el acompañamiento que necesitas y a encontrar la ruta más adecuada dentro del CEEDi.',
-    fotoId: 'trabajo-en-grupo',
   })}`,
 });
 
@@ -337,28 +365,21 @@ pagina({
   descripcion: 'Te acompañamos en el diseño y fortalecimiento de experiencias de aprendizaje de acuerdo con las necesidades de tus estudiantes y de tu contexto de enseñanza.',
   activa: 'area-experiencias',
   cuerpo: `
-${portada({
-    color: 'rojo',
-    clase: 'display--area',
+${cabezote({
     h1: ['Diseño de Experiencias'],
+    migas: [{ t: 'Diseño de Experiencias' }],
+    fotoId: 'profesor-en-aula',
+    foco: '62% 30%',
+    vt: 'puerta-experiencias',
+  })}
+${intro({
     texto: 'Te acompañamos en el diseño y fortalecimiento de experiencias de aprendizaje, articulando propósitos, actividades, metodologías, evaluación y recursos de acuerdo con las necesidades de tus estudiantes y de tu contexto de enseñanza.',
     acciones: `<a class="btn" href="solicita-acompanamiento.html?ruta=disenar">Solicitar acompañamiento</a>`,
-    fotoId: 'profesor-en-aula',
-    foco: '42% 30%',
-    domoH: '9.9vw',
-    vt: 'puerta-experiencias',
   })}
 
 <section class="seccion" aria-labelledby="acompanar-t">
-  <div class="rejilla dos">
-    <div class="dos__izq">
-      <h2 class="titulo" id="acompanar-t" data-sube>¿En qué podemos acompañarte?</h2>
-      <figure class="dos__foto arco foto-fondo" data-abre>${foto('profesora-explicando')}</figure>
-    </div>
-    <ul class="dos__der puntos">
-      ${C.NECESIDADES_EXP.map((n, i) => `<li class="punto" data-fila style="--d:${i * 70}ms"><h3>${vineta}${n.t}</h3><p>${n.p}</p></li>`).join('')}
-    </ul>
-  </div>
+  ${cabSeccion({ id: 'acompanar-t', titulo: '¿En qué podemos acompañarte?' })}
+  ${dos(fotoDos('profesora-explicando'), `<ul class="dos__der puntos">${C.NECESIDADES_EXP.map((n, i) => `<li class="punto" data-fila style="--d:${i * 70}ms"><h3>${vineta}${n.t}</h3><p>${n.p}</p></li>`).join('')}</ul>`)}
 </section>
 
 ${etapas({
@@ -369,20 +390,14 @@ ${etapas({
   })}
 
 <section class="seccion seccion--pegada" aria-labelledby="relacionados-t">
-  <div class="rejilla dos">
-    <div class="dos__izq">
-      <h2 class="titulo" id="relacionados-t" data-sube>Recursos relacionados</h2>
-      <p data-sube style="--d:80ms">Guías, plantillas y orientaciones para empezar por tu cuenta. El resto está en el banco general.</p>
-      <div class="acciones" data-sube style="--d:140ms"><a class="btn" href="recursos.html#diseno-y-ensenanza">Ver recursos de Diseño de Experiencias</a></div>
-      <figure class="dos__foto arco foto-fondo" data-abre style="--d:120ms">${foto('trabajo-en-grupo')}</figure>
-    </div>
-    <ul class="dos__der recursos-fila">${C.RELACIONADOS_EXP.map(filaRecurso).join('')}</ul>
-  </div>
+  ${cabSeccion({ id: 'relacionados-t', titulo: 'Recursos relacionados', texto: 'Guías, plantillas y orientaciones para empezar por tu cuenta. El resto está en el banco general.' })}
+  ${dos(fotoDos('trabajo-en-grupo'), `<ul class="dos__der recursos-fila">${C.RELACIONADOS_EXP.map(filaRecurso).join('')}</ul>`)}
+  ${pieSeccion('<a class="btn" href="recursos.html#diseno-y-ensenanza">Ver recursos de Diseño de Experiencias</a>')}
 </section>
 
 ${equipo({ intro: 'Conoce a las personas que acompañan el diseño y fortalecimiento de experiencias de aprendizaje desde el CEEDi.', lista: C.EQUIPO.experiencias })}
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Tienes una experiencia que quieres crear, transformar o fortalecer?', href: 'solicita-acompanamiento.html?ruta=disenar', fotoId: 'tablero' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Tienes una experiencia que quieres crear, transformar o fortalecer?', href: 'solicita-acompanamiento.html?ruta=disenar' })}`,
 });
 
 /* ---------------- 3. Diseño de Recursos ---------------- */
@@ -416,29 +431,29 @@ pagina({
   descripcion: 'Diseñamos y desarrollamos recursos educativos digitales que ayudan a materializar experiencias de aprendizaje en formatos pertinentes para cada necesidad.',
   activa: 'area-recursos',
   cuerpo: `
-${portada({
-    color: 'vino',
-    clase: 'display--area',
+${cabezote({
     h1: ['Diseño de Recursos'],
-    texto: 'Diseñamos y desarrollamos recursos educativos digitales que ayudan a materializar experiencias de aprendizaje en formatos pertinentes para cada necesidad.',
-    acciones: `<a class="btn" href="solicita-acompanamiento.html?ruta=crear">Quiero desarrollar un recurso</a>`,
+    migas: [{ t: 'Diseño de Recursos' }],
     fotoId: 'diseno-en-equipo',
     foco: '50% 40%',
-    domoH: '9.9vw',
     vt: 'puerta-recursos',
+  })}
+${intro({
+    texto: 'Diseñamos y desarrollamos recursos educativos digitales que ayudan a materializar experiencias de aprendizaje en formatos pertinentes para cada necesidad.',
+    acciones: `<a class="btn" href="solicita-acompanamiento.html?ruta=crear">Quiero desarrollar un recurso</a>`,
   })}
 
 <section class="seccion" aria-labelledby="crear-t">
-  <h2 class="titulo" id="crear-t" data-sube>¿Qué podemos crear contigo?</h2>
+  ${cabSeccion({ id: 'crear-t', titulo: '¿Qué podemos crear contigo?' })}
   <ul class="mosaico">
     ${C.CATEGORIAS_REC.map((c, i) => `
     <li data-sube style="--d:${i * 90}ms">
-      <div class="mosaico__arte arco" style="--c:${c.c};--t:${c.t}">${ILUS[c.ilus]}</div>
+      <div class="mosaico__arte caja" style="--c:${c.c};--t:${c.t}">${ILUS[c.ilus]}</div>
       <h3>${c.t2}</h3>
       <p>${c.p}</p>
     </li>`).join('')}
   </ul>
-  <div class="orienta arco" data-sube>
+  <div class="orienta caja" data-sube>
     <h3>¿No sabes qué formato necesitas?</h3>
     <div class="orienta__txt">
       <p>No necesitas llegar con el recurso definido. Cuéntanos qué quieres lograr y te ayudamos a identificar una alternativa pertinente.</p>
@@ -448,42 +463,30 @@ ${portada({
 </section>
 
 <section class="seccion seccion--pegada" aria-labelledby="proposito-t">
-  <h2 class="titulo" id="proposito-t" data-sube>Del propósito al recurso</h2>
+  ${cabSeccion({ id: 'proposito-t', titulo: 'Del propósito al recurso' })}
   <ol class="flujo">
-    ${C.FLUJO.map((f, i) => {
-      const y = 246 * (1 - f.lleno);
-      return `
+    ${C.FLUJO.map((f, i) => `
     <li data-llena data-sube style="--d:${i * 110}ms">
-      <svg class="flujo__arco" viewBox="0 0 491.82 245.91" aria-hidden="true">
-        <clipPath id="fl${i}"><path d="${ARCO}"/></clipPath>
-        <g clip-path="url(#fl${i})"><rect class="flujo__lleno" x="0" y="${y.toFixed(1)}" width="492" height="${(246 - y).toFixed(1)}" style="--d:${i * 110 + 240}ms;--c:${f.c}"/></g>
-        <path class="flujo__traza" d="${ARCO}"/>
-      </svg>
+      <div class="flujo__caja" aria-hidden="true"><span class="flujo__lleno" style="--lleno:${f.lleno};--d:${i * 110 + 240}ms;--c:${f.c}"></span><span class="flujo__paso">${String(i + 1).padStart(2, '0')}</span></div>
       <h3>${f.t}</h3>
       <p>${f.p}</p>
-    </li>`;
-    }).join('')}
+    </li>`).join('')}
   </ol>
 </section>
 
 <section class="seccion seccion--pegada" aria-labelledby="casos-t">
-  <div class="rejilla equipo__cab">
-    <h2 class="titulo" id="casos-t" data-sube>Explora recursos creados con CEEDi</h2>
-    <div data-sube style="--d:80ms">
-      <p>Una selección pequeña para ayudarte a imaginar posibilidades.</p>
-      <div class="acciones"><a class="btn" href="recursos.html#recursos-educativos-digitales">Explorar recursos</a></div>
-    </div>
-  </div>
-  <ul class="casos" style="margin-top:0">
-    <li class="caso" data-sube><div class="caso__still arco" style="--c:var(--coral)">${stillInfo}</div><h3>Ciclo de evaluación formativa</h3><span class="caso__tipo">Recurso gráfico</span><p>Infografía para un curso de primer semestre.</p></li>
-    <li class="caso" data-sube style="--d:90ms"><div class="caso__still arco" style="--c:var(--vino-o)">${stillVideo}</div><h3>Cápsula de contabilidad</h3><span class="caso__tipo">Recurso audiovisual</span><p>Video corto de apoyo para repasar un concepto antes de clase.</p></li>
-    <li class="caso" data-sube style="--d:180ms"><div class="caso__still arco" style="--c:var(--blanco)">${stillInter}</div><h3>Simulador de decisiones éticas</h3><span class="caso__tipo">Recurso interactivo</span><p>Los estudiantes toman decisiones y ven sus consecuencias.</p></li>
+  ${cabSeccion({ id: 'casos-t', titulo: 'Explora recursos creados con CEEDi', texto: 'Una selección pequeña para ayudarte a imaginar posibilidades.' })}
+  <ul class="casos">
+    <li class="caso" data-sube><div class="caso__still caja" style="--c:var(--coral)">${stillInfo}</div><h3>Ciclo de evaluación formativa</h3><span class="caso__tipo">Recurso gráfico</span><p>Infografía para un curso de primer semestre.</p></li>
+    <li class="caso" data-sube style="--d:90ms"><div class="caso__still caja" style="--c:var(--vino-o)">${stillVideo}</div><h3>Cápsula de contabilidad</h3><span class="caso__tipo">Recurso audiovisual</span><p>Video corto de apoyo para repasar un concepto antes de clase.</p></li>
+    <li class="caso" data-sube style="--d:180ms"><div class="caso__still caja" style="--c:var(--blanco)">${stillInter}</div><h3>Simulador de decisiones éticas</h3><span class="caso__tipo">Recurso interactivo</span><p>Los estudiantes toman decisiones y ven sus consecuencias.</p></li>
   </ul>
+  ${pieSeccion('<a class="btn" href="recursos.html#recursos-educativos-digitales">Explorar recursos</a>')}
 </section>
 
 ${equipo({ intro: 'Conoce a las personas que transforman necesidades educativas en recursos digitales junto con los profesores UAO.', lista: C.EQUIPO.recursos })}
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Tienes una idea que quieres convertir en un recurso?', href: 'solicita-acompanamiento.html?ruta=crear', fotoId: 'diseno-en-equipo' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Tienes una idea que quieres convertir en un recurso?', href: 'solicita-acompanamiento.html?ruta=crear' })}`,
 });
 
 /* ---------------- 4. Cultura Digital ---------------- */
@@ -493,23 +496,20 @@ pagina({
   descripcion: 'Te acompañamos en la apropiación de tecnologías, herramientas y prácticas digitales para que puedas incorporarlas con sentido a tu práctica educativa.',
   activa: 'area-cultura',
   cuerpo: `
-${portada({
-    color: 'coral',
-    clase: 'display--area',
+${cabezote({
     h1: ['Cultura Digital'],
-    texto: 'Te acompañamos en la apropiación de tecnologías, herramientas y prácticas digitales para que puedas incorporarlas con sentido a tu práctica educativa.',
-    acciones: `<a class="btn" href="#fortalecer">Fortalecer mi práctica digital</a>`,
+    migas: [{ t: 'Cultura Digital' }],
     fotoId: 'sala-de-computo',
     foco: '50% 60%',
-    domoH: '9.9vw',
     vt: 'puerta-cultura',
+  })}
+${intro({
+    texto: 'Te acompañamos en la apropiación de tecnologías, herramientas y prácticas digitales para que puedas incorporarlas con sentido a tu práctica educativa.',
+    acciones: `<a class="btn" href="#fortalecer">Fortalecer mi práctica digital</a>`,
   })}
 
 <section class="seccion" id="fortalecer" aria-labelledby="fortalecer-t">
-  <div class="rejilla cabfoto">
-    <h2 class="titulo" id="fortalecer-t" data-sube>¿Qué quieres fortalecer?</h2>
-    <figure class="arco foto-fondo" data-abre>${foto('profesora-explicando')}</figure>
-  </div>
+  ${cabSeccion({ id: 'fortalecer-t', titulo: '¿Qué quieres fortalecer?' })}
   <div class="rutas">
     ${C.RUTAS_CD.map((r, i) => `
     <a class="ruta" href="${r.href}" data-fila style="--d:${i * 70}ms">
@@ -521,36 +521,24 @@ ${portada({
 </section>
 
 <section class="seccion seccion--pegada" aria-labelledby="aprende-t">
-  <div class="rejilla dos">
-    <div class="dos__izq">
-      <h2 class="titulo" id="aprende-t" data-sube>Aprende y ponlo en práctica</h2>
-      <div class="acciones" data-sube style="--d:80ms;margin-top:clamp(18px,2vw,28px)"><a class="btn" href="formacion.html">Ver toda la formación</a></div>
-      <figure class="dos__foto arco foto-fondo" data-abre>${foto('trabajo-en-grupo')}</figure>
-    </div>
-    <ul class="dos__der puntos">
-      ${C.APRENDE_CD.map((n, i) => `<li class="punto" data-fila style="--d:${i * 70}ms"><h3 style="font-size:var(--s-lead);letter-spacing:-.02em;font-weight:500">${vineta}${n.t}</h3><p>${n.p}</p></li>`).join('')}
-    </ul>
-  </div>
+  ${cabSeccion({ id: 'aprende-t', titulo: 'Aprende y ponlo en práctica' })}
+  ${dos(fotoDos('trabajo-en-grupo'), `<ul class="dos__der puntos">${C.APRENDE_CD.map((n, i) => `<li class="punto" data-fila style="--d:${i * 70}ms"><h3>${vineta}${n.t}</h3><p>${n.p}</p></li>`).join('')}</ul>`)}
+  ${pieSeccion('<a class="btn" href="formacion.html">Ver toda la formación</a>')}
 </section>
 
 <section class="campo campo--vino herr" aria-labelledby="herr-t">
-  <div class="campo__arco arco" style="--outer:var(--crema)">
-    <div class="rejilla indice__cab" style="margin-bottom:0">
-      <h2 class="titulo" id="herr-t" data-sube>Herramientas para tu práctica</h2>
-      <div class="herr__txt" data-sube style="--d:80ms">
-        <p style="grid-column:auto">Encuentra guías y orientaciones para aprovechar las herramientas digitales institucionales en tus experiencias de enseñanza.</p>
-        <div class="acciones" style="margin-top:18px"><a class="btn" href="recursos.html#herramientas-digitales">Explorar herramientas</a></div>
-      </div>
-    </div>
+  <div class="campo__cuerpo">
+    ${cabSeccion({ id: 'herr-t', titulo: 'Herramientas para tu práctica', texto: 'Encuentra guías y orientaciones para aprovechar las herramientas digitales institucionales en tus experiencias de enseñanza.' })}
     <ul class="herr__lista">
       ${C.HERRAMIENTAS.map((h, i) => `<li class="herr__item" data-fila style="--d:${i * 80}ms">${icono(h.i)}<div><h3>${h.t}</h3><p>${h.p}</p></div></li>`).join('')}
     </ul>
+    ${pieSeccion('<a class="btn" href="recursos.html#herramientas-digitales">Explorar herramientas</a>')}
   </div>
 </section>
 
 ${equipo({ intro: 'Conoce a las personas que acompañan la apropiación de tecnologías y el fortalecimiento de la cultura digital en la comunidad universitaria.', lista: C.EQUIPO.cultura })}
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres fortalecer algún aspecto de tu práctica digital?', href: 'solicita-acompanamiento.html?ruta=fortalecer', fotoId: 'lectura-campus' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres fortalecer algún aspecto de tu práctica digital?', href: 'solicita-acompanamiento.html?ruta=fortalecer' })}`,
 });
 
 /* ---------------- 5. Recursos ---------------- */
@@ -560,21 +548,19 @@ pagina({
   descripcion: 'Encuentra guías, plantillas, orientaciones y materiales para apoyar el diseño de tus experiencias de aprendizaje y el uso pedagógico de tecnologías.',
   activa: 'recursos',
   cuerpo: `
-${portada({
-    color: 'coral',
-    clase: 'display--medio',
-    h1: ['Recursos para', 'tu práctica'],
-    texto: 'Encuentra guías, plantillas, orientaciones y materiales para apoyar el diseño de tus experiencias de aprendizaje y el uso pedagógico de tecnologías.',
-    acciones: `<a class="btn" href="#banco">Ver recursos</a>`,
+${cabezote({
+    h1: ['Recursos para tu práctica'],
+    migas: [{ t: 'Recursos' }],
     fotoId: 'lectura-campus',
     foco: '50% 50%',
-    domo: '36%',
-    domoH: '7.75vw',
   })}
 
-<nav class="saltos" aria-label="Categorías de recursos" style="margin-top:clamp(20px,3vw,44px)" id="banco">
+<nav class="saltos" aria-label="Categorías de recursos" id="banco">
   ${C.BANCO.map((c) => `<a href="#${c.id}">${vineta}<span>${c.nombre}</span></a>`).join('')}
 </nav>
+${intro({
+    texto: 'Encuentra guías, plantillas, orientaciones y materiales para apoyar el diseño de tus experiencias de aprendizaje y el uso pedagógico de tecnologías.',
+  })}
 
 <div class="seccion" style="padding-top:clamp(32px,4vw,56px)">
   ${C.BANCO.map((c) => `
@@ -582,15 +568,15 @@ ${portada({
     <div class="categoria__cab">
       <h2 id="${c.id}-t" data-sube>${c.nombre}</h2>
       <span class="categoria__cuenta">${c.items.length} recursos</span>
-      <figure class="arco foto-fondo" data-abre>${foto(c.foto)}</figure>
     </div>
+    <figure class="categoria__foto caja foto-fondo" data-abre>${foto(c.foto)}</figure>
     <ul class="categoria__lista">
       ${c.items.map(filaRecurso).join('')}
     </ul>
   </section>`).join('')}
 </div>
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿No encuentras lo que buscas? Cuéntanos qué necesitas y te orientamos.', fotoId: 'estudiantes-campus' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿No encuentras lo que buscas? Cuéntanos qué necesitas y te orientamos.' })}`,
 });
 
 /* ---------------- 6. Formación ---------------- */
@@ -600,27 +586,23 @@ pagina({
   descripcion: 'Encuentra oportunidades para fortalecer tus competencias, explorar nuevas posibilidades y llevarlas a tu práctica educativa.',
   activa: 'formacion',
   cuerpo: `
-${portada({
-    color: 'vino',
-    clase: 'display--medio',
-    h1: ['Formación', 'para profesores'],
-    texto: 'Encuentra oportunidades para fortalecer tus competencias, explorar nuevas posibilidades y llevarlas a tu práctica educativa.',
-    acciones: `<a class="btn" href="#proximas">Ver próximas oportunidades</a>`,
+${cabezote({
+    h1: ['Formación para profesores'],
+    migas: [{ t: 'Formación' }],
     fotoId: 'auditorio',
     foco: '50% 50%',
-    domo: '36%',
-    domoH: '7.75vw',
+  })}
+${intro({
+    texto: 'Encuentra oportunidades para fortalecer tus competencias, explorar nuevas posibilidades y llevarlas a tu práctica educativa.',
+    acciones: `<a class="btn" href="#proximas">Ver próximas oportunidades</a>`,
   })}
 
 <section class="seccion" id="proximas" aria-labelledby="proximas-t">
-  <div class="rejilla cabfoto">
-    <h2 class="titulo" id="proximas-t" data-sube>Próximas oportunidades</h2>
-    <figure class="arco foto-fondo" data-abre>${foto('profesora-explicando')}</figure>
-  </div>
+  ${cabSeccion({ id: 'proximas-t', titulo: 'Próximas oportunidades' })}
   <ul class="oportunidades">
     ${C.PROXIMAS.map((o, i) => `
     <li class="oportunidad" data-sube style="--d:${i * 90}ms">
-      <div class="oportunidad__fecha arco" style="--c:${o.c};--t:${o.t}">${o.fechaLarga}</div>
+      <div class="oportunidad__fecha caja" style="--c:${o.c};--t:${o.t}">${o.fechaLarga}</div>
       <h3>${o.nombre}</h3>
       <span class="oportunidad__modo">${o.modo}</span>
       <p>${o.texto}</p>
@@ -630,30 +612,22 @@ ${portada({
 </section>
 
 <section class="campo campo--vino" id="rutas" aria-labelledby="rutas-t">
-  <div class="campo__arco arco" style="--outer:var(--crema)">
-    <div class="rejilla dos">
-      <div class="dos__izq">
-        <h2 class="titulo" id="rutas-t" data-sube>Rutas de formación</h2>
-        <p data-sube style="--d:80ms">Trayectorias y cursos de mayor alcance, descritos por lo que podrás desarrollar.</p>
-        <div class="acciones" data-sube style="--d:140ms"><a class="btn" href="#agenda">Explorar rutas de formación</a></div>
-        <figure class="dos__foto arco foto-fondo" data-abre style="--outer:var(--vino-o)">${foto('estudiantes-campus')}</figure>
-      </div>
-      <ul class="dos__der lista-rutas">
-        ${C.RUTAS_F.map((r, i) => `<li data-fila style="--d:${i * 80}ms"><h3>${vineta}${r.t}</h3><p>${r.p}</p></li>`).join('')}
-      </ul>
-    </div>
+  <div class="campo__cuerpo">
+    ${cabSeccion({ id: 'rutas-t', titulo: 'Rutas de formación', texto: 'Trayectorias y cursos de mayor alcance, descritos por lo que podrás desarrollar.' })}
+    ${dos(fotoDos('estudiantes-campus'), `<ul class="dos__der lista-rutas">${C.RUTAS_F.map((r, i) => `<li data-fila style="--d:${i * 80}ms"><h3>${vineta}${r.t}</h3><p>${r.p}</p></li>`).join('')}</ul>`)}
+    ${pieSeccion('<a class="btn" href="#agenda">Explorar rutas de formación</a>')}
   </div>
 </section>
 
 <section class="seccion" id="agenda" aria-labelledby="agenda-t">
-  <h2 class="titulo" id="agenda-t" data-sube>Agenda y actividades</h2>
+  ${cabSeccion({ id: 'agenda-t', titulo: 'Agenda y actividades' })}
   <table class="tabla" data-sube style="--d:80ms">
     <thead><tr><th scope="col">Fecha</th><th scope="col">Actividad</th><th scope="col">Modalidad</th></tr></thead>
     <tbody>${C.AGENDA.map((a) => `<tr><td>${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td></tr>`).join('')}</tbody>
   </table>
 </section>
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres llevar lo que aprendes a un curso concreto? Te acompañamos.', href: 'solicita-acompanamiento.html?ruta=fortalecer', fotoId: 'pasillo' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres llevar lo que aprendes a un curso concreto? Te acompañamos.', href: 'solicita-acompanamiento.html?ruta=fortalecer' })}`,
 });
 
 /* ---------------- 7. CEEDi / Nosotros ---------------- */
@@ -663,27 +637,25 @@ pagina({
   descripcion: 'El Centro de Excelencia Educativa Digital articula el diseño de experiencias de aprendizaje, la creación de recursos educativos digitales y la apropiación de la cultura digital.',
   activa: 'ceedi',
   cuerpo: `
-${portada({
-    color: 'rojo',
-    clase: 'display--ceedi',
+${cabezote({
     h1: ['Centro de Excelencia', 'Educativa Digital'],
-    texto: 'El Centro de Excelencia Educativa Digital (CEEDi) articula el diseño de experiencias de aprendizaje, la creación de recursos educativos digitales y la apropiación de la cultura digital para fortalecer los procesos de enseñanza y aprendizaje en la Universidad Autónoma de Occidente.',
-    acciones: `<a class="btn" href="#equipo">Nuestro equipo</a><a class="btn btn--secundario" href="#contacto">Contacto</a>`,
+    migas: [{ t: 'Quiénes somos' }],
     fotoId: 'campus-panoramica',
     foco: '62% 50%',
-    domo: '36%',
-    domoH: '7.75vw',
+    clase: 'cabezote--completa',
+    lema: 'Universidad Autónoma<br>de Occidente',
+  })}
+${intro({
+    texto: 'El Centro de Excelencia Educativa Digital (CEEDi) articula el diseño de experiencias de aprendizaje, la creación de recursos educativos digitales y la apropiación de la cultura digital para fortalecer los procesos de enseñanza y aprendizaje en la Universidad Autónoma de Occidente.',
+    acciones: `<a class="btn" href="#equipo">Nuestro equipo</a><a class="btn btn--secundario" href="#contacto">Contacto</a>`,
   })}
 
-<section class="seccion" aria-labelledby="hacemos-t">
-  <div class="rejilla cabfoto">
-    <h2 class="titulo" id="hacemos-t" data-sube>Qué hacemos</h2>
-    <figure class="arco foto-fondo" data-abre>${foto('pasillo')}</figure>
-  </div>
+<section class="seccion" id="que-hacemos" aria-labelledby="hacemos-t">
+  ${cabSeccion({ id: 'hacemos-t', titulo: 'Qué hacemos' })}
   <ul class="areas">
     ${C.AREAS.map((a, i) => `
     <li class="area" style="--c:${a.c};--t:${a.t};--d:${i * 90}ms" data-sube>
-      <div class="area__arco arco"><h3>${a.nombre}</h3></div>
+      <div class="area__bloque caja"><h3>${a.nombre}</h3></div>
       <p>${a.breve}</p>
       <a class="btn btn--ghost" href="${a.href}">Conocer el área<span class="sr">: ${a.nombre}</span></a>
     </li>`).join('')}
@@ -691,7 +663,7 @@ ${portada({
 </section>
 
 <section class="seccion seccion--pegada" id="equipo" aria-labelledby="nuestro-t">
-  <h2 class="titulo" id="nuestro-t" data-sube style="margin-bottom:clamp(28px,3.4vw,52px)">Nuestro equipo</h2>
+  ${cabSeccion({ id: 'nuestro-t', titulo: 'Nuestro equipo' })}
   ${C.AREAS.map((a) => `
   <section class="grupo" aria-labelledby="grupo-${a.id}">
     <div class="grupo__cab"><h3 id="grupo-${a.id}">${a.nombre}</h3><a class="btn btn--ghost" href="${a.href}">Ver el área</a></div>
@@ -700,18 +672,11 @@ ${portada({
 </section>
 
 <section class="seccion seccion--pegada" id="contacto" aria-labelledby="contacto-t">
-  <div class="rejilla dos">
-    <div class="dos__izq">
-      <h2 class="titulo" id="contacto-t" data-sube>Contacto</h2>
-      <ul class="contacto">
-        ${C.CONTACTO.map((c, i) => `<li class="contacto__item" data-fila style="--d:${i * 70}ms">${icono(c.i)}<div><h3>${c.t}</h3><p>${c.p}</p></div></li>`).join('')}
-      </ul>
-    </div>
-    <figure class="dos__der arco foto-fondo" data-abre style="aspect-ratio:1.5/1;--dome:56%">${foto('campus-anfiteatro')}</figure>
-  </div>
+  ${cabSeccion({ id: 'contacto-t', titulo: 'Contacto' })}
+  ${dos(fotoDos('campus-anfiteatro'), `<ul class="dos__der contacto">${C.CONTACTO.map((c, i) => `<li class="contacto__item" data-fila style="--d:${i * 70}ms">${icono(c.i)}<div><h3>${c.t}</h3><p>${c.p}</p></div></li>`).join('')}</ul>`)}
 </section>
 
-${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres trabajar con nosotros en tu próximo curso?', fotoId: 'campus-puente' })}`,
+${cierre({ titulo: 'Solicita acompañamiento', pregunta: '¿Quieres trabajar con nosotros en tu próximo curso?' })}`,
 });
 
 /* ---------------- 8. Solicita acompañamiento ---------------- */
@@ -721,24 +686,25 @@ pagina({
   descripcion: 'No necesitas saber qué área o servicio necesitas. Cuéntanos brevemente tu idea, necesidad o reto y te orientaremos.',
   activa: 'solicita',
   cuerpo: `
-<section class="portada portada--sinfoto c-rojo" style="--dome-hero:36%;--dome-h:7.75vw">
-  <div class="portada__campo"></div>
-  <div class="portada__titulo"><h1 class="display--medio lines">${lineas(['Cuéntanos qué', 'quieres lograr.'])}</h1></div>
-  <div class="portada__texto" style="grid-column:2/-2">
-    <p class="lead" data-llega style="--d:420ms;max-width:38em">No necesitas saber qué área o servicio necesitas. Cuéntanos brevemente tu idea, necesidad o reto y te orientaremos sobre la alternativa de acompañamiento más adecuada.</p>
-  </div>
-  <div class="domo portada__domo"></div>
-</section>
+${cabezote({
+    h1: ['Cuéntanos qué quieres lograr'],
+    migas: [{ t: 'Solicita acompañamiento' }],
+    fotoId: 'trabajo-en-grupo',
+    foco: '50% 40%',
+  })}
+${intro({
+    texto: 'No necesitas saber qué área o servicio necesitas. Cuéntanos brevemente tu idea, necesidad o reto y te orientaremos sobre la alternativa de acompañamiento más adecuada.',
+  })}
 
-<section class="seccion" style="padding-top:clamp(40px,5vw,72px)" aria-labelledby="eleccion-t">
+<section class="seccion" style="padding-top:clamp(36px,4vw,60px)" aria-labelledby="eleccion-t">
   <form id="solicitud" action="#gracias" method="post">
-    <h2 class="titulo" id="eleccion-t" data-sube style="margin-bottom:clamp(22px,2.6vw,36px)">¿Qué te trae por aquí?</h2>
+    ${cabSeccion({ id: 'eleccion-t', titulo: '¿Qué te trae por aquí?' })}
     <fieldset class="opciones">
       <legend class="sr">Elige la opción que más se parece a lo que necesitas</legend>
       ${C.OPCIONES.map((o, i) => `
       <label class="opcion" data-sube style="--d:${i * 70}ms">
         <input type="radio" name="ruta" value="${o.v}">
-        <span class="opcion__arco arco"><span class="opcion__txt">${o.t}</span><span class="opcion__foto">${foto(o.foto).replace(/alt="[^"]*"/, 'alt=""')}</span></span>
+        <span class="opcion__tarjeta caja"><span class="opcion__txt">${o.t}</span><span class="opcion__foto">${sinAlt(foto(o.foto))}</span></span>
       </label>`).join('')}
     </fieldset>
     <p class="nota" data-aviso-ruta hidden style="margin-top:10px;font-weight:600;color:var(--vino)">Elige una opción para continuar. Si no estás seguro, marca “Tengo otra necesidad / No estoy seguro”.</p>
@@ -774,7 +740,7 @@ pagina({
       </div>
     </div>
   </form>
-  <div class="gracias arco" id="gracias" hidden>
+  <div class="gracias caja" id="gracias" hidden>
     <h2 class="titulo">Recibimos tu solicitud.</h2>
     <p>Te escribiremos a tu correo institucional con la alternativa de acompañamiento más adecuada.</p>
     <a class="btn btn--ghost" href="index.html">Volver al inicio</a>
